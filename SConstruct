@@ -8,5 +8,5 @@ env = Environment(
     LINKFLAGS="-stdlib=libc++")
 
 env.Program(
-    target="asynctest",
-    source=["asynctest.cpp"])
+    target="seriestest",
+    source=["seriestest.cpp"])
