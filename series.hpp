@@ -82,6 +82,8 @@ void series(std::vector<Task<T>> &tasks,
     // DebugScope d("callback");
     assert(state);
 
+    printf("in CB STATE=%d\n", state.use_count());
+
     state->callback_called = true;
     state->results.push_back(result);
 
@@ -123,7 +125,6 @@ void series(std::vector<Task<T>> &tasks,
 
     if (state->iter == state->tasks->end()) {
       // No more tasks to process.  Release the shared pointer to `state`.
-      printf("finished invoke\n");
       printf("invoke state count: %ld\n", state.use_count());
       state.reset();
     }
