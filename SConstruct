@@ -9,4 +9,4 @@ env = Environment(
 
 env.Program(
     target="seriestest",
-    source=["seriestest.cpp"])
+    source=["test/seriestest.cpp"])

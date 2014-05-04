@@ -1,4 +1,4 @@
-#include "async.hpp"
+#include "../async.hpp"
 
 #define BOOST_TEST_MODULE SeriesTest
 #include <boost/test/included/unit_test.hpp>

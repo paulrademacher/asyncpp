@@ -13,6 +13,6 @@ typedef enum {
 
 }
 
-#include "series.hpp"
+#include "lib/series.hpp"
 
 #endif
