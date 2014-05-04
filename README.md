@@ -20,6 +20,8 @@ Each task may invoke its callback immediately, or at some point in the future.
 
 Build using `scons`.
 
-```test/series.cpp```
-```test/series-boost-asio.cpp```
+```
+test/series.cpp
+test/series-boost-asio.cpp
+```
 
