@@ -81,15 +81,15 @@ void series(std::vector<Task<T>> &tasks,
   }
 
   state->callback = [state](ErrorCode error, T result) mutable {
-    if (error == DEBUG_COMMAND) {
-      printf("CB debug: %lu\n", state.use_count());
-      return;
-    }
-
     assert(state);
 
     state->callback_called = true;
     state->results.push_back(result);
+
+    if (error != OK) {
+      // Stop iterating.
+      state->iter = state->tasks->end();
+    }
 
     if (state->iter == state->tasks->end()) {
       // We're done.  No more tasks, so no more callbacks.

@@ -7,8 +7,7 @@ namespace async {
 
 typedef enum {
   OK = 0,
-  FAIL = -1,
-  DEBUG_COMMAND = -2
+  FAIL = -1
 } ErrorCode;
 
 }
