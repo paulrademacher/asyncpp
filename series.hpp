@@ -35,7 +35,13 @@ using TaskVector = std::vector<Task<T>>;
 // This value can be asserted to equal zero if there's no pending series callbacks.
 // Otherwise, if it's non-zero after all series callbacks have executed, we have a memory
 // leak.
-std::atomic<int> debug_series_state_count(0);
+namespace priv {
+std::atomic<int> series_state_count(0);
+}
+
+int get_state_count() {
+  return priv::series_state_count;
+}
 
 // `tasks` and `final_callback` are passed by reference.  It is the responsibility of the
 // caller to ensure that their lifetime exceeds the lifetime of the series call.
@@ -45,7 +51,7 @@ void series(std::vector<Task<T>> &tasks,
 
   struct SeriesState {
     SeriesCallback<T> callback;
-    std::function<void()> invoke_until_async;
+    std::function<void()> invoke_until_deferred_callback;
     std::vector<Task<T>> *tasks;
     typename TaskVector<T>::iterator iter;
     bool is_inside_task;
@@ -54,13 +60,11 @@ void series(std::vector<Task<T>> &tasks,
     const SeriesCompletionCallback<T> *final_callback;
 
     SeriesState() {
-      debug_series_state_count++;
-      printf("> SeriesState\n");
+      priv::series_state_count++;
     }
 
     ~SeriesState() {
-      debug_series_state_count--;
-      printf("< SeriesState\n\n");
+      priv::series_state_count--;
     }
   };
 
@@ -76,36 +80,47 @@ void series(std::vector<Task<T>> &tasks,
     return;
   }
 
-  // Capture tasks by reference to not copy the vector.  `iter` is bound to the original
-  // vector.
   state->callback = [state](ErrorCode error, T result) mutable {
-    // DebugScope d("callback");
-    assert(state);
+    if (error == DEBUG_COMMAND) {
+      printf("CB debug: %lu\n", state.use_count());
+      return;
+    }
 
-    printf("in CB STATE=%d\n", state.use_count());
+    assert(state);
 
     state->callback_called = true;
     state->results.push_back(result);
 
     if (state->iter == state->tasks->end()) {
       // We're done.  No more tasks, so no more callbacks.
-      printf("finished callbacks\n");
-      printf("cb state count: %ld\n", state.use_count());
-
       (*state->final_callback)(error, state->results);
 
-      state.reset();
+      // Empty the callback inside the SeriesState object.  This releases the shared_ptr
+      // inside the callback which points back to the SeriesState itself.  When the
+      // original instance of this callback, and all copies, and the function
+      // `invoke_until_deferred_callback` are all released (go out of scope or are explicity deleted),
+      // then there will be no more shared_ptrs to SeriesState, and SeriesState will be deleted.
+
+      // Note that it is not sufficient here to reset the `state` shared_ptr.  Consider
+      // this example: Let's day a Task defers the call to `callback`, and stores a *copy*
+      // of that callback, to be called later.  The original callback is inside
+      // SeriesState, but the copy is not.  When the callback-copy is invoked at some
+      // point in the future, it will run through its logic, eventually completing the
+      // series and ending up at this point.  Then assume it reset its state shared_ptr.
+      // That is good to free up that pointer... however, the original instance of the
+      // callback lambda still holds a `series` shared_ptr.  Because that original lambda is inside
+      // SeriesState, is won't go out of scope until the SeriesState does.  But the lambda holds
+      // a pointer to the SeriesState, so SeriesState won't ever go out of scope --> Memory leak.
+      // By removing the original callback from SeriesState, we break the cycle.
+      state->callback = [](ErrorCode e, T r){};
     } else if (!state->is_inside_task) {
-      state->invoke_until_async();
+      state->invoke_until_deferred_callback();
     }
   };
 
-  // Capture tasks by reference to not copy the vector.  `iter` is bound to the original
-  // vector.
-  state->invoke_until_async = [state]() mutable {
+  state->invoke_until_deferred_callback = [state]() mutable {
     assert(state);
 
-    // DebugScope d("invoke_until_async");
     while (state->iter != state->tasks->end()) {
       state->is_inside_task = true;
       state->callback_called = false;
@@ -124,15 +139,16 @@ void series(std::vector<Task<T>> &tasks,
     }
 
     if (state->iter == state->tasks->end()) {
-      // No more tasks to process.  Release the shared pointer to `state`.
-      printf("invoke state count: %ld\n", state.use_count());
-      state.reset();
+      // No more tasks to process.
+
+      // Clear the callback inside the SeriesState, to break the ownership cycle and allow
+      // SeriesState to go out of scope once callbacks complete.  See comments inside
+      // `callback` function for details.
+      state->invoke_until_deferred_callback = [](){};
     }
   };
 
-  state->invoke_until_async();
-
-  state.reset();
+  state->invoke_until_deferred_callback();
 }
 
 }
