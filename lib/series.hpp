@@ -27,10 +27,10 @@ template<typename T>
 void noop_series_final_callback(ErrorCode e, std::vector<T> p) {};
 
 template <typename T>
-using Task = std::function<void(SeriesCallback<T>&)>;
+using SeriesTask = std::function<void(SeriesCallback<T>&)>;
 
 template<typename T>
-using TaskVector = std::vector<Task<T>>;
+using SeriesTaskVector = std::vector<SeriesTask<T>>;
 
 // This value can be asserted to equal zero if there's no pending series callbacks.
 // Otherwise, if it's non-zero after all series callbacks have executed, we have a memory
@@ -46,14 +46,14 @@ int get_state_count() {
 // `tasks` and `final_callback` are passed by reference.  It is the responsibility of the
 // caller to ensure that their lifetime exceeds the lifetime of the series call.
 template<typename T>
-void series(std::vector<Task<T>> &tasks,
+void series(std::vector<SeriesTask<T>> &tasks,
     const SeriesCompletionCallback<T> &final_callback=noop_series_final_callback<T>) {
 
   struct SeriesState {
     SeriesCallback<T> callback;
     std::function<void()> invoke_until_deferred_callback;
-    std::vector<Task<T>> *tasks;
-    typename TaskVector<T>::iterator iter;
+    std::vector<SeriesTask<T>> *tasks;
+    typename SeriesTaskVector<T>::iterator iter;
     bool is_inside_task;
     bool callback_called;
     std::vector<T> results;
@@ -102,16 +102,17 @@ void series(std::vector<Task<T>> &tasks,
       // then there will be no more shared_ptrs to SeriesState, and SeriesState will be deleted.
 
       // Note that it is not sufficient here to reset the `state` shared_ptr.  Consider
-      // this example: Let's day a Task defers the call to `callback`, and stores a *copy*
-      // of that callback, to be called later.  The original callback is inside
+      // this example: Let's day a SeriesTask defers the call to `callback`, and stores a
+      // *copy* of that callback, to be called later.  The original callback is inside
       // SeriesState, but the copy is not.  When the callback-copy is invoked at some
       // point in the future, it will run through its logic, eventually completing the
       // series and ending up at this point.  Then assume it reset its state shared_ptr.
       // That is good to free up that pointer... however, the original instance of the
-      // callback lambda still holds a `series` shared_ptr.  Because that original lambda is inside
-      // SeriesState, is won't go out of scope until the SeriesState does.  But the lambda holds
-      // a pointer to the SeriesState, so SeriesState won't ever go out of scope --> Memory leak.
-      // By removing the original callback from SeriesState, we break the cycle.
+      // callback lambda still holds a `series` shared_ptr.  Because that original lambda
+      // is inside SeriesState, is won't go out of scope until the SeriesState does.  But
+      // the lambda holds a pointer to the SeriesState, so SeriesState won't ever go out
+      // of scope --> Memory leak.  By removing the original callback from SeriesState, we
+      // break the cycle.
       state->callback = [](ErrorCode e, T r){};
     } else if (!state->is_inside_task) {
       state->invoke_until_deferred_callback();

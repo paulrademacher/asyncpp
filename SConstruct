@@ -10,3 +10,7 @@ env = Environment(
 env.Program(
     target="seriestest",
     source=["test/seriestest.cpp"])
+
+env.Program(
+    target="series",
+    source=["examples/series.cpp"])
