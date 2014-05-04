@@ -126,7 +126,7 @@ void series(std::vector<SeriesTask<T>> &tasks,
       // then there will be no more shared_ptrs to SeriesState, and SeriesState will be deleted.
 
       // Note that it is not sufficient here to reset the `state` shared_ptr.  Consider
-      // this example: Let's day a SeriesTask defers the call to `callback`, and stores a
+      // this example: Let's say a SeriesTask defers the call to `callback`, and stores a
       // *copy* of that callback, to be called later.  The original callback is inside
       // SeriesState, but the copy is not.  When the callback-copy is invoked at some
       // point in the future, it will run through its logic, eventually completing the
