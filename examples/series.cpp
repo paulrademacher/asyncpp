@@ -7,13 +7,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   async::SeriesTaskVector<int> tasks {
-    [](async::SeriesCallback<int> callback) {
+    [](async::TaskCallback<int> callback) {
       callback(async::OK, 1);
     },
-    [](async::SeriesCallback<int> callback) {
+    [](async::TaskCallback<int> callback) {
       callback(async::OK, 2);
     },
-    [](async::SeriesCallback<int> callback) {
+    [](async::TaskCallback<int> callback) {
       callback(async::OK, 3);
     }
   };

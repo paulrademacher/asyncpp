@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   boost::asio::deadline_timer timer(io_service);
 
   async::SeriesTaskVector<int> tasks {
-    [&timer](async::SeriesCallback<int> callback) {
+    [&timer](async::TaskCallback<int> callback) {
       timer.expires_from_now(seconds(1));
       timer.async_wait([=] (const boost::system::error_code& error) {
             cout << "Task 1 completed" << endl;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
           });
     },
 
-    [&timer](async::SeriesCallback<int> callback) {
+    [&timer](async::TaskCallback<int> callback) {
       timer.expires_from_now(seconds(1));
       timer.async_wait([=] (const boost::system::error_code& error) {
             cout << "Task 2 completed" << endl;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
           });
     },
 
-    [&timer](async::SeriesCallback<int> callback) {
+    [&timer](async::TaskCallback<int> callback) {
       timer.expires_from_now(seconds(1));
       timer.async_wait([=] (const boost::system::error_code& error) {
             cout << "Task 3 completed" << endl;

@@ -5,29 +5,15 @@
 
 #include <atomic>
 #include <cassert>
-#include <functional>
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "debug.hpp"
 
 namespace async {
 
-template<typename T>
-using SeriesCallback = std::function<void(ErrorCode error, T result)>;
-
-template<typename T>
-void noop_series_callback(ErrorCode e, T result) {};
-
-template<typename T>
-using SeriesCompletionCallback = std::function<void(ErrorCode, std::vector<T>&)>;
-
-template<typename T>
-void noop_series_final_callback(ErrorCode e, std::vector<T> p) {};
-
 template <typename T>
-using SeriesTask = std::function<void(SeriesCallback<T>&)>;
+using SeriesTask = std::function<void(TaskCallback<T>&)>;
 
 template<typename T>
 using SeriesTaskVector = std::vector<SeriesTask<T>>;
@@ -39,7 +25,7 @@ namespace priv {
 std::atomic<int> series_state_count(0);
 }
 
-int get_state_count() {
+int get_series_state_count() {
   return priv::series_state_count;
 }
 
@@ -71,28 +57,28 @@ int get_state_count() {
 // caller to ensure that their lifetime exceeds the lifetime of the series call.
 template<typename T>
 void series(std::vector<SeriesTask<T>> &tasks,
-    const SeriesCompletionCallback<T> &final_callback=noop_series_final_callback<T>) {
+    const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
-  struct SeriesState {
-    SeriesCallback<T> callback;
+  struct State {
+    TaskCallback<T> callback;
     std::function<void()> invoke_until_deferred_callback;
     std::vector<SeriesTask<T>> *tasks;
     typename SeriesTaskVector<T>::iterator iter;
     bool is_inside_task;
     bool callback_called;
     std::vector<T> results;
-    const SeriesCompletionCallback<T> *final_callback;
+    const TaskCompletionCallback<T> *final_callback;
 
-    SeriesState() {
+    State() {
       priv::series_state_count++;
     }
 
-    ~SeriesState() {
+    ~State() {
       priv::series_state_count--;
     }
   };
 
-  auto state = std::make_shared<SeriesState>();
+  auto state = std::make_shared<State>();
   state->tasks = &tasks;
   state->final_callback = &final_callback;
   state->iter = tasks.begin();
@@ -119,23 +105,23 @@ void series(std::vector<SeriesTask<T>> &tasks,
       // We're done.  No more tasks, so no more callbacks.
       (*state->final_callback)(error, state->results);
 
-      // Empty the callback inside the SeriesState object.  This releases the shared_ptr
-      // inside the callback which points back to the SeriesState itself.  When the
+      // Empty the callback inside the State object.  This releases the shared_ptr
+      // inside the callback which points back to the State itself.  When the
       // original instance of this callback, and all copies, and the function
       // `invoke_until_deferred_callback` are all released (go out of scope or are explicity deleted),
-      // then there will be no more shared_ptrs to SeriesState, and SeriesState will be deleted.
+      // then there will be no more shared_ptrs to State, and State will be deleted.
 
       // Note that it is not sufficient here to reset the `state` shared_ptr.  Consider
       // this example: Let's say a SeriesTask defers the call to `callback`, and stores a
       // *copy* of that callback, to be called later.  The original callback is inside
-      // SeriesState, but the copy is not.  When the callback-copy is invoked at some
+      // State, but the copy is not.  When the callback-copy is invoked at some
       // point in the future, it will run through its logic, eventually completing the
       // series and ending up at this point.  Then assume it reset its state shared_ptr.
       // That is good to free up that pointer... however, the original instance of the
       // callback lambda still holds a `series` shared_ptr.  Because that original lambda
-      // is inside SeriesState, is won't go out of scope until the SeriesState does.  But
-      // the lambda holds a pointer to the SeriesState, so SeriesState won't ever go out
-      // of scope --> Memory leak.  By removing the original callback from SeriesState, we
+      // is inside State, is won't go out of scope until the State does.  But
+      // the lambda holds a pointer to the State, so State won't ever go out
+      // of scope --> Memory leak.  By removing the original callback from State, we
       // break the cycle.
       state->callback = [](ErrorCode e, T r){};
     } else if (!state->is_inside_task) {
@@ -166,8 +152,8 @@ void series(std::vector<SeriesTask<T>> &tasks,
     if (state->iter == state->tasks->end()) {
       // No more tasks to process.
 
-      // Clear the callback inside the SeriesState, to break the ownership cycle and allow
-      // SeriesState to go out of scope once callbacks complete.  See comments inside
+      // Clear the callback inside the State, to break the ownership cycle and allow
+      // State to go out of scope once callbacks complete.  See comments inside
       // `callback` function for details.
       state->invoke_until_deferred_callback = [](){};
     }
