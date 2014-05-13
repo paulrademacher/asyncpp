@@ -27,6 +27,7 @@ void map(std::vector<T> objects,
     std::shared_ptr<State> keep_alive;
     std::atomic<int> results_count;
     const TaskCompletionCallback<T> *final_callback;
+    bool had_error = false;
 
     State() {
       priv::map_state_count++;
@@ -48,12 +49,20 @@ void map(std::vector<T> objects,
   for (int i = 0; i < objects.size(); i++) {
     auto object = objects[i];
     func(object, [i, state](ErrorCode error, T result) {
-          // TODO: deal with error.
+          if (state->had_error) {
+            // There was an error code earlier, so work has finished.
+            return;
+          }
+
           state->results[i] = result;
 
           state->results_count++;
 
-          if (state->results_count == state->results.size()) {
+          if (error != OK) {
+            state->had_error = true;
+          }
+
+          if (state->had_error || state->results_count == state->results.size()) {
             // All results have been collected.
 
             (*state->final_callback)(error, state->results);
