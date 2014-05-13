@@ -20,12 +20,18 @@ int get_map_state_count() {
 template<typename T>
 void map(std::vector<T> objects,
     std::function<void(T, TaskCallback<T>)> func,
-    const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
+    const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
+    unsigned int task_limit=0) {
+
+  if (task_limit == 0 || task_limit > objects.size()) {
+    task_limit = objects.size();
+  }
 
   struct State {
     std::vector<T> results;
     std::shared_ptr<State> keep_alive;
     std::atomic<int> results_count;
+    unsigned int task_limit;
     const TaskCompletionCallback<T> *final_callback;
     bool had_error = false;
 
@@ -45,6 +51,7 @@ void map(std::vector<T> objects,
   state->keep_alive = state;
   state->final_callback = &final_callback;
   state->results_count.store(0);
+  state->task_limit = task_limit;
 
   for (int i = 0; i < objects.size(); i++) {
     auto object = objects[i];
