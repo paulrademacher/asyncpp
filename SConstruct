@@ -7,8 +7,20 @@ env = Environment(
 
     LINKFLAGS="-stdlib=libc++")
 
-env.Program(target="bin/seriestest", source=["test/seriestest.cpp"])
+examples = [
+    env.Program(target="bin/series", source=["examples/series.cpp"]),
+    env.Program(target="bin/series-boost-asio", source=["examples/series-boost-asio.cpp"]),
+    env.Program(target="bin/map", source=["examples/map.cpp"]),
+    ]
 
-env.Program(target="bin/series", source=["examples/series.cpp"])
-env.Program(target="bin/series-boost-asio", source=["examples/series-boost-asio.cpp"])
-env.Program(target="bin/map", source=["examples/map.cpp"])
+tests = [
+    env.Program(target="bin/seriestest", source=["test/seriestest.cpp"]),
+    env.Program(target="bin/maptest", source=["test/maptest.cpp"]),
+    ]
+
+test_alias = Alias("test", tests, [t[0].path for t in tests])
+
+# Simply required.  Without it, these are never considered out of date.
+AlwaysBuild(test_alias)
+AlwaysBuild(examples)
+

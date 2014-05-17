@@ -38,12 +38,10 @@ void map(std::vector<T> objects,
 
     State() {
       priv::map_state_count++;
-      printf("> STATE\n");
     }
 
     ~State() {
       priv::map_state_count--;
-      printf("< STATE\n");
     }
   };
 
