@@ -7,8 +7,8 @@ env = Environment(
 
     LINKFLAGS="-stdlib=libc++")
 
-env.Program(target="seriestest", source=["test/seriestest.cpp"])
+env.Program(target="bin/seriestest", source=["test/seriestest.cpp"])
 
-env.Program(target="series", source=["examples/series.cpp"])
-env.Program(target="series-boost-asio", source=["examples/series-boost-asio.cpp"])
-env.Program(target="map", source=["examples/map.cpp"])
+env.Program(target="bin/series", source=["examples/series.cpp"])
+env.Program(target="bin/series-boost-asio", source=["examples/series-boost-asio.cpp"])
+env.Program(target="bin/map", source=["examples/map.cpp"])
