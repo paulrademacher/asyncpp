@@ -29,13 +29,12 @@ resolver.async_resolve(query, [=](error_code& err, ...) {
 }
 ```
 
-with **asyncpp** we can instead write this as an un-nested sequence of steps:
+with **asyncpp** we can instead write this as a flat sequence of steps:
 
 ```
 using Callback = async::TaskCallback<int>;
 async::SeriesTaskVector<int> tasks {
     [](Callback next) {
-        // Do stuff, then:
         resolver.async_resolve(query, [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
