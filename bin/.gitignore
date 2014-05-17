@@ -1,1 +1,4 @@
+# Ignore all files in /bin directory.
+
+*
 !.gitignore
