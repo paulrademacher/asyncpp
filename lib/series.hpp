@@ -3,7 +3,6 @@
 #ifndef __ASYNC_SERIES_HPP__
 #define __ASYNC_SERIES_HPP__
 
-#include <atomic>
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -22,7 +21,7 @@ using SeriesTaskVector = std::vector<SeriesTask<T>>;
 // Otherwise, if it's non-zero after all series callbacks have executed, we have a memory
 // leak.
 namespace priv {
-std::atomic<int> series_state_count(0);
+int series_state_count;
 }
 
 int get_series_state_count() {

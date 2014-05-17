@@ -3,14 +3,12 @@
 #ifndef __ASYNC_MAP_HPP__
 #define __ASYNC_MAP_HPP__
 
-#include <atomic>
-
 namespace async {
 
 // This value can be asserted to equal zero if there's no pending callbacks.  Otherwise,
 // if it's non-zero after all callbacks have executed, we have a memory leak.
 namespace priv {
-std::atomic<int> map_state_count(0);
+int map_state_count = 0;
 }
 
 int get_map_state_count() {
@@ -31,7 +29,7 @@ void map(std::vector<T> objects,
     std::function<void()> spawn_one;
     std::vector<T> results;
     std::shared_ptr<State> keep_alive;
-    std::atomic<int> results_count;
+    unsigned int results_count;
     unsigned int task_limit;
     unsigned int task_counter;
     bool reached_limit;
@@ -53,7 +51,7 @@ void map(std::vector<T> objects,
   state->results = std::vector<T>(objects.size());
   state->keep_alive = state;
   state->final_callback = &final_callback;
-  state->results_count.store(0);
+  state->results_count = 0;
   state->task_limit = task_limit;
   state->task_counter = 0;
   state->reached_limit = false;
