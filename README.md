@@ -19,7 +19,7 @@ resolver.async_resolve(query, [=](error_code& err, ...) {
                     asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                         // Do stuff, then:
                         asio::async_read_until(socket, response, "\r\n\r\n", [=](error_code& err, ...) {
-                            // Keep nesting and nesting until you tab key breaks :-(
+                            // Keep nesting and nesting until your tab key breaks :-(
                         }
                     }
                 }
