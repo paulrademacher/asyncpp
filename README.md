@@ -35,25 +35,32 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
 using Callback = async::TaskCallback<int>;
 async::SeriesTaskVector<int> tasks {
     [](Callback next) {
-        resolver.async_resolve(query, [=](error_code& err, ...) { next(async::OK); };
+        resolver.async_resolve(query,
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_connect(socket, iter, [=](error_code& err, ...) { next(async::OK); };
+        asio::async_connect(socket, iter,
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_write(socket, request, [=](error_code& err, ...) { next(async::OK); };
+        asio::async_write(socket, request,
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_read_until(socket, response, "\r\n", [=](error_code& err, ...) { next(async::OK); };
+        asio::async_read_until(socket, response, "\r\n",
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_read_until(socket, response, "\r\n", [=](error_code& err, ...) { next(async::OK); };
+        asio::async_read_until(socket, response, "\r\n",
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_read_until(socket, response, "\r\n", [=](error_code& err, ...) { next(async::OK); };
+        asio::async_read_until(socket, response, "\r\n",
+            [=](error_code& err, ...) { next(async::OK); };
     }, [](Callback next) {
         // Do stuff, then:
-        asio::async_read_until(socket, response, "\r\n\r\n", [=](error_code& err, ...) { next(async::OK); };
+        asio::async_read_until(socket, response, "\r\n\r\n",
+            [=](error_code& err, ...) { next(async::OK); };
     }
 };
 
