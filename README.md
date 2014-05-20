@@ -4,7 +4,7 @@ Asyncpp is a C++ utility library for asynchronous or functional programming usin
 
 This is a C++ version of the [async](https://github.com/caolan/async) Node.js library.
 
-This is useful, for example, with the Boost ASIO network library.  Instead of writing (pseudocode):
+This is useful, for example, with the Boost ASIO network library.  Instead of writing:
 ```
 resolver.async_resolve(query, [=](error_code& err, ...) {
     // Do stuff, then:
