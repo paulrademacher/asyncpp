@@ -27,7 +27,8 @@ void noop_task_final_callback(ErrorCode e, std::vector<T> p) {};
 
 }
 
-#include "lib/map.hpp"
-#include "lib/series.hpp"
+#include "map.hpp"
+#include "series.hpp"
+#include "sequencer.hpp"
 
 #endif

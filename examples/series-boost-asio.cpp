@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include "../async.hpp"
+#include "../async/async.hpp"
 
 using boost::posix_time::seconds;
 using namespace std;

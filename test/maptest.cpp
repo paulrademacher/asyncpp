@@ -1,4 +1,4 @@
-#include "../async.hpp"
+#include "../async/async.hpp"
 
 #define BOOST_TEST_MODULE MapTest
 #include <boost/test/included/unit_test.hpp>
