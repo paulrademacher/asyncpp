@@ -167,28 +167,29 @@ template<typename T>
 void series(std::vector<SeriesTask<T>> &tasks,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
-  auto results_shared_ptr = std::make_shared<std::vector<T>>(tasks.size());
+  std::vector<T>* results = new std::vector<T>(tasks.size());
 
   auto tasks_begin = begin(tasks);
   auto tasks_end = end(tasks);
 
-  auto callback = [results_shared_ptr](SeriesTask<T> task, int index, bool is_last_time, int& data_dummy,
+  auto callback = [results](SeriesTask<T> task, int index, bool is_last_time, int& data_dummy,
       std::function<void(bool, ErrorCode)> callback_done) {
 
-    TaskCallback<T> task_callback = [callback_done, results_shared_ptr, index](ErrorCode error, T result) {
-      (*results_shared_ptr)[index] = result;
+    TaskCallback<T> task_callback = [callback_done, results, index](ErrorCode error, T result) {
+      (*results)[index] = result;
       callback_done(error == OK, error);
     };
     task(task_callback);
   };
 
-  auto wrapped_final_callback = [results_shared_ptr, final_callback](ErrorCode error, int& data_dummy) {
-    final_callback(error, *results_shared_ptr);
+  auto wrapped_final_callback = [results, final_callback](ErrorCode error, int& data_dummy) {
+    final_callback(error, *results);
+    delete results;
   };
 
   int data = 0;
   run_sequence<SeriesTask<T>, decltype(tasks_begin), int>
-      (tasks_begin, tasks_end, 0, data, callback, wrapped_final_callback);
+      (tasks_begin, tasks_end, 1, data, callback, wrapped_final_callback);
 }
 
 }
