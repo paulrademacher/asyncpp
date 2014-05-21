@@ -17,20 +17,16 @@ int get_run_sequence_state_count() {
 
 template <typename T, typename TIter, typename CustomData>
 void run_sequence(TIter items_begin, TIter items_end,
-    size_t output_vector_size,
     unsigned int limit,
     CustomData& data,
-    std::function<void(T item, int index, bool is_last_item,
-        std::vector<T>& output_vector, CustomData& data,
+    std::function<void(T item, int index, bool is_last_item, CustomData& data,
         std::function<void(bool keep_going, ErrorCode error)> callback_done)> callback,
-    std::function<void(ErrorCode error, std::vector<T>& output_vector,
-        CustomData& data)> final_callback) {
+    std::function<void(ErrorCode error, CustomData& data)> final_callback) {
 
   size_t num_items = items_end - items_begin;
 
   if (num_items == 0) {
-    std::vector<T> output_vector(output_vector_size);
-    final_callback(async::OK, output_vector, data);
+    final_callback(async::OK, data);
     return;
   }
 
@@ -40,7 +36,6 @@ void run_sequence(TIter items_begin, TIter items_end,
 
   struct State {
     std::shared_ptr<State> keep_alive;
-    std::vector<T> output_vector;
     TIter item_iter;
     unsigned int limit;
     unsigned int item_index = 0;
@@ -61,7 +56,6 @@ void run_sequence(TIter items_begin, TIter items_end,
   auto state = std::make_shared<State>();
 
   state->keep_alive = state;
-  state->output_vector = std::vector<T>(output_vector_size);
   state->item_iter = items_begin;
   state->limit = limit;
 
@@ -76,8 +70,7 @@ void run_sequence(TIter items_begin, TIter items_end,
     state->item_iter++;
     state->item_index++;
 
-    callback(item, state->item_index - 1, state->item_index == num_items,
-        state->output_vector, data,
+    callback(item, state->item_index - 1, state->item_index == num_items, data,
         [&data, &final_callback, num_items, state] (bool keep_going, ErrorCode error) {
 
           state->callbacks_outstanding--;
@@ -101,7 +94,7 @@ void run_sequence(TIter items_begin, TIter items_end,
           if (state->stop || state->num_completed == num_items) {
             // All done.
 
-            final_callback(error, state->output_vector, data);
+            final_callback(error, data);
 
             state->spawn_one = [](){};  // Break circular dependency, so state can
                                         // release.

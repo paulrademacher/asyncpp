@@ -9,6 +9,8 @@
 
 #include "debug.hpp"
 
+#include "sequencer.hpp"
+
 namespace async {
 
 template <typename T>
@@ -165,10 +167,26 @@ template<typename T>
 void series(std::vector<SeriesTask<T>> &tasks,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
+  auto results_shared_ptr = std::make_shared<std::vector<T>>(tasks.size());
+
   auto tasks_begin = begin(tasks);
   auto tasks_end = end(tasks);
-  run_sequence<SeriesTask<T>, decltype(tasks_begin), decltype(tasks_end)>
-      (tasks_begin, tasks_end, 0, 
+
+  auto callback = [results_shared_ptr](SeriesTask<T> task, int index, bool is_last_time, int& data_dummy,
+      std::function<void(bool, ErrorCode)> callback_done) {
+    auto task_callback = [callback_done, results_shared_ptr, index](ErrorCode error, T result) {
+      (*results_shared_ptr)[index] = result;
+      callback_done(error == OK, error);
+    };
+    task(task_callback);
+  };
+
+  auto wrapped_final_callback = [results_shared_ptr, final_callback](ErrorCode error, int& data_dummy) {
+    final_callback(error, *results_shared_ptr);
+  };
+
+  run_sequence<SeriesTask<T>, decltype(tasks_begin), int>
+      (tasks_begin, tasks_end, 0, 0, callback, wrapped_final_callback);
 }
 
 }

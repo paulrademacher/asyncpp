@@ -11,8 +11,7 @@ int main(int argc, char *argv[]) {
 
   int custom_data = 999;
 
-  auto callback = [](int item, int index, bool is_last_time,
-      std::vector<int>& output_vector, int& data,
+  auto callback = [](int item, int index, bool is_last_time, int& data,
       std::function<void(bool, async::ErrorCode)> callback_done) {
 
     printf("%d %d %d %d\n", item, index, is_last_time, data);
@@ -21,13 +20,12 @@ int main(int argc, char *argv[]) {
       callback_done(true, async::OK);
   };
 
-  auto final_callback = [](async::ErrorCode error, std::vector<int>& output_vector,
-      int& data) {
+  auto final_callback = [](async::ErrorCode error, int& data) {
     printf("DONE\n");
   };
 
   async::run_sequence<int, std::vector<int>::iterator, int>
-      (ints.begin(), ints.end(), 0, 5, custom_data, callback,
+      (ints.begin(), ints.end(), 5, custom_data, callback,
           final_callback);
   return 0;
 }
