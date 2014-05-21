@@ -55,7 +55,7 @@ int get_series_state_count() {
 // `tasks` and `final_callback` are passed by reference.  It is the responsibility of the
 // caller to ensure that their lifetime exceeds the lifetime of the series call.
 template<typename T>
-void series(std::vector<SeriesTask<T>> &tasks,
+void series_full(std::vector<SeriesTask<T>> &tasks,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
   struct State {
@@ -159,6 +159,16 @@ void series(std::vector<SeriesTask<T>> &tasks,
   };
 
   state->invoke_until_deferred_callback();
+}
+
+template<typename T>
+void series(std::vector<SeriesTask<T>> &tasks,
+    const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
+
+  auto tasks_begin = begin(tasks);
+  auto tasks_end = end(tasks);
+  run_sequence<SeriesTask<T>, decltype(tasks_begin), decltype(tasks_end)>
+      (tasks_begin, tasks_end, 0, 
 }
 
 }
