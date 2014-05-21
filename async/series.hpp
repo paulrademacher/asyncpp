@@ -174,7 +174,8 @@ void series(std::vector<SeriesTask<T>> &tasks,
 
   auto callback = [results_shared_ptr](SeriesTask<T> task, int index, bool is_last_time, int& data_dummy,
       std::function<void(bool, ErrorCode)> callback_done) {
-    auto task_callback = [callback_done, results_shared_ptr, index](ErrorCode error, T result) {
+
+    TaskCallback<T> task_callback = [callback_done, results_shared_ptr, index](ErrorCode error, T result) {
       (*results_shared_ptr)[index] = result;
       callback_done(error == OK, error);
     };
@@ -185,8 +186,9 @@ void series(std::vector<SeriesTask<T>> &tasks,
     final_callback(error, *results_shared_ptr);
   };
 
+  int data = 0;
   run_sequence<SeriesTask<T>, decltype(tasks_begin), int>
-      (tasks_begin, tasks_end, 0, 0, callback, wrapped_final_callback);
+      (tasks_begin, tasks_end, 0, data, callback, wrapped_final_callback);
 }
 
 }
