@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     printf("DONE\n");
   };
 
-  async::run_sequence<int, std::vector<int>::iterator, int>
+  async::sequencer<int, std::vector<int>::iterator, int>
       (ints.begin(), ints.end(), 5, custom_data, callback,
           final_callback);
   return 0;

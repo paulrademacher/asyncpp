@@ -8,15 +8,15 @@ namespace async {
 // This value can be asserted to equal zero if there's no pending callbacks.  Otherwise,
 // if it's non-zero after all callbacks have executed, we have a memory leak.
 namespace priv {
-int run_sequence_state_count = 0;
+int sequencer_state_count = 0;
 }
 
-int get_run_sequence_state_count() {
-  return priv::run_sequence_state_count;
+int get_sequencer_state_count() {
+  return priv::sequencer_state_count;
 }
 
 template <typename T, typename TIter, typename CustomData>
-void run_sequence(TIter items_begin, TIter items_end,
+void sequencer(TIter items_begin, TIter items_end,
     unsigned int limit,
     CustomData& data,
     std::function<void(T item, int index, bool is_last_item, CustomData& data,
@@ -45,11 +45,11 @@ void run_sequence(TIter items_begin, TIter items_end,
     std::function<void()> spawn_one;
 
     State() {
-      priv::run_sequence_state_count++;
+      priv::sequencer_state_count++;
     }
 
     ~State() {
-      priv::run_sequence_state_count--;
+      priv::sequencer_state_count--;
     }
   };
 

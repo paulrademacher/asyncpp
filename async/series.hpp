@@ -188,7 +188,7 @@ void series(std::vector<SeriesTask<T>> &tasks,
   };
 
   int data = 0;
-  run_sequence<SeriesTask<T>, decltype(tasks_begin), int>
+  sequencer<SeriesTask<T>, decltype(tasks_begin), int>
       (tasks_begin, tasks_end, 1, data, callback, wrapped_final_callback);
 }
 
