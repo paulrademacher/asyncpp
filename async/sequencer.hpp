@@ -59,7 +59,7 @@ void run_sequence(TIter items_begin, TIter items_end,
   state->item_iter = items_begin;
   state->limit = limit;
 
-  state->spawn_one = [&callback, &data, final_callback,
+  state->spawn_one = [callback, &data, final_callback,
       &items_end, num_items, state]() mutable {
 
     state->callbacks_outstanding++;

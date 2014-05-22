@@ -167,7 +167,7 @@ template<typename T>
 void series(std::vector<SeriesTask<T>> &tasks,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
-  std::vector<T>* results = new std::vector<T>(tasks.size());
+  std::vector<T>* results = new std::vector<T>();
 
   auto tasks_begin = begin(tasks);
   auto tasks_end = end(tasks);
@@ -176,7 +176,7 @@ void series(std::vector<SeriesTask<T>> &tasks,
       std::function<void(bool, ErrorCode)> callback_done) {
 
     TaskCallback<T> task_callback = [callback_done, results, index](ErrorCode error, T result) {
-      (*results)[index] = result;
+      results->push_back(result);
       callback_done(error == OK, error);
     };
     task(task_callback);
