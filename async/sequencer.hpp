@@ -15,6 +15,12 @@ int get_sequencer_state_count() {
   return priv::sequencer_state_count;
 }
 
+/**
+ * `limit` - the max number of items to process asynchronously.  If all items
+ *      invoke their completion callbacks synchronously, then `limit` has no
+ *      effect and the items proceed serially.  Set `limit` to 0 to indicate
+ *      no limit on max number of asynchronous outstanding items.
+ */
 template <typename T, typename TIter, typename CustomData>
 void sequencer(TIter items_begin, TIter items_end,
     unsigned int limit,
@@ -25,6 +31,9 @@ void sequencer(TIter items_begin, TIter items_end,
 
   size_t num_items = items_end - items_begin;
 
+  // If no items, invoke the final callback immediately with a success code.
+  // This is easier than ensuring the complex logic below does the right thing for
+  // an empty iterator.
   if (num_items == 0) {
     final_callback(async::OK, data);
     return;
@@ -87,7 +96,8 @@ void sequencer(TIter items_begin, TIter items_end,
           state->num_completed++;
 
           if (!keep_going) {
-            // If callback says stop, stop.  But don't ever set variable back to false.
+            // If callback says to stop, then stop.  But don't ever set this variable back to
+            // false.
             state->stop = true;
           }
 
@@ -96,8 +106,23 @@ void sequencer(TIter items_begin, TIter items_end,
 
             final_callback(error, data);
 
-            state->spawn_one = [](){};  // Break circular dependency, so state can
-                                        // release.
+            // Break circular dependency, so state can release.
+            //
+            // The circular dependency is this:
+            //   The singular State object contains the spawn_one std::function /
+            //   lambda.  But that lambda captures `state` by value.  Because
+            //   `state` is a shared_ptr, the capture creates a new shared_ptr,
+            //   thereby incrementing the refcount of `state` by one.
+            //   So even when all variables naturally go out of scope, the `state`
+            //   object will still hold spawn_one, which holds `state`.
+            //
+            // Here we set spawn_one to an empty lambda, which clears the held
+            // shared_ptr to state.
+            //
+            // Note that it is not sufficient to reset the `state` shared_ptr here.
+            // That wouldn't break the circular ref.
+            state->spawn_one = [](){};
+
             state->keep_alive.reset();
           } else if (state->callbacks_outstanding == state->limit - 1) {
             // We'd spawned as many items as our limit allows.  Since this callback
