@@ -3,6 +3,8 @@
 #ifndef __ASYNC_MAP_HPP__
 #define __ASYNC_MAP_HPP__
 
+#include "sequencer.hpp"
+
 namespace async {
 
 // This value can be asserted to equal zero if there's no pending callbacks.  Otherwise,
@@ -16,7 +18,7 @@ int get_map_state_count() {
 }
 
 template<typename T>
-void map(std::vector<T> objects,
+void map_full(std::vector<T> objects,
     std::function<void(T, TaskCallback<T>)> func,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
     unsigned int task_limit=0) {
@@ -97,6 +99,35 @@ void map(std::vector<T> objects,
   while (state->task_counter < task_limit) {
     state->spawn_one();
   }
+}
+
+// TODO: Make versions that take reference and also another with by-value callbacks, to
+// support lambda decls inline in function calls.
+
+// `objects`, `func`, and `final_callback` are passed by reference.  It is the
+// responsibility of the caller to ensure that their lifetime exceeds the lifetime of the
+// series call.
+template<typename T>
+void map(std::vector<T> objects,
+    std::function<void(T, TaskCallback<T>)> func,
+    const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
+    unsigned int task_limit=0) {
+
+  std::vector<T>* results = new std::vector<T>(objects.size());
+
+  auto objects_begin = begin(objects);
+  auto objects_end = end(objects);
+
+  auto callback = [results, func](T object, int index, bool is_last_time, int& data_dummy,
+      std::function<void(bool, ErrorCode)> callback_done) {
+  };
+
+  auto wrapped_final_callback = [results, final_callback](ErrorCode error, int& data_dummy) {
+  };
+
+  int data = 0;
+  sequencer<T, decltype(objects_begin), int>
+      (objects_begin, objects_end, task_limit, data, callback, final_callback);
 }
 
 }
