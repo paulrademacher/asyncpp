@@ -5,9 +5,9 @@
 
 
 BOOST_AUTO_TEST_CASE(test1) {
-  BOOST_REQUIRE_EQUAL(async::get_map_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::map code in its own scope, before then checking
-  // get_map_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     bool callback_called = false;
     std::vector<int> objects { 1, 2, 3, 4 };
@@ -21,18 +21,18 @@ BOOST_AUTO_TEST_CASE(test1) {
       BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
           begin(expected), end(expected));
       BOOST_CHECK_EQUAL(error, async::OK);
-      BOOST_CHECK(async::get_map_state_count() > 0);
+      BOOST_CHECK(async::get_sequencer_state_count() > 0);
     };
-    async::map_full<int>(objects, callback, final_callback);
+    async::map<int>(objects, callback, final_callback);
     BOOST_CHECK(callback_called);
   }
-  BOOST_CHECK_EQUAL(async::get_map_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_map_with_limits) {
-  BOOST_REQUIRE_EQUAL(async::get_map_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::map code in its own scope, before then checking
-  // get_map_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     bool callback_called = false;
     std::vector<int> objects { 1, 2, 3, 4 };
@@ -47,18 +47,18 @@ BOOST_AUTO_TEST_CASE(test_map_with_limits) {
           BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
               begin(expected), end(expected));
           BOOST_CHECK_EQUAL(error, async::OK);
-          BOOST_CHECK(async::get_map_state_count() > 0);
+          BOOST_CHECK(async::get_sequencer_state_count() > 0);
         },
       limit);
     BOOST_CHECK(callback_called);
   }
-  BOOST_CHECK_EQUAL(async::get_map_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_map_with_error) {
-  BOOST_REQUIRE_EQUAL(async::get_map_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::map code in its own scope, before then checking
-  // get_map_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     bool callback_called = false;
     std::vector<int> objects { 1, 2, 3, 4 };
@@ -77,12 +77,12 @@ BOOST_AUTO_TEST_CASE(test_map_with_error) {
           BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
               begin(expected), end(expected));
           BOOST_CHECK_EQUAL(error, async::FAIL);
-          BOOST_CHECK(async::get_map_state_count() > 0);
+          BOOST_CHECK(async::get_sequencer_state_count() > 0);
         },
       limit);
     BOOST_CHECK(callback_called);
   }
-  BOOST_CHECK_EQUAL(async::get_map_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(map_test) {

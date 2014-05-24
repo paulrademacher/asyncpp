@@ -10,9 +10,9 @@ void task3(async::TaskCallback<int> &callback) { callback(async::OK, 3); }
 void task_fail(async::TaskCallback<int> &callback) { callback(async::FAIL, -1); }
 
 BOOST_AUTO_TEST_CASE(test1) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     auto completion_callback = [](async::ErrorCode error, std::vector<int> &results) {
       std::vector<int> expected { 1, 2, 3 };
@@ -23,13 +23,13 @@ BOOST_AUTO_TEST_CASE(test1) {
     std::vector<async::SeriesTask<int>> tasks = { task1, task2, task3 };
     async::series<int>(tasks, completion_callback);
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test2) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     async::TaskCallback<int> deferred_callback;
 
@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_CASE(test2) {
     // Invoke the callback.
     task_deferred_complete();
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test3) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     async::TaskCallback<int> deferred_callback;
 
@@ -90,13 +90,13 @@ BOOST_AUTO_TEST_CASE(test3) {
     task_deferred_complete();
     task_deferred_complete();
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test4) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     async::TaskCallback<int> deferred_callback;
 
@@ -124,13 +124,13 @@ BOOST_AUTO_TEST_CASE(test4) {
     task_deferred_complete();
     task_deferred_complete();
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_error_code) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     auto completion_callback = [](async::ErrorCode error, std::vector<int> &results) {
       std::vector<int> expected { 1, 2, -1 };
@@ -141,13 +141,13 @@ BOOST_AUTO_TEST_CASE(test_error_code) {
     std::vector<async::SeriesTask<int>> tasks = { task1, task2, task_fail, task3 };
     async::series<int>(tasks, completion_callback);
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_error_code2) {
-  BOOST_REQUIRE_EQUAL(async::get_series_state_count(), 0);
+  BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);
   // Run the async::series code in its own scope, before then checking
-  // get_series_state_count()==0.
+  // get_sequencer_state_count()==0.
   {
     auto completion_callback = [](async::ErrorCode error, std::vector<int> &results) {
       std::vector<int> expected { -1 };
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_error_code2) {
     std::vector<async::SeriesTask<int>> tasks = { task_fail };
     async::series<int>(tasks, completion_callback);
   }
-  BOOST_CHECK_EQUAL(async::get_series_state_count(), 0);
+  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(series_test) {

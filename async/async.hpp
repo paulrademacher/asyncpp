@@ -3,6 +3,7 @@
 #ifndef __ASYNC_ASYNC_HPP__
 #define __ASYNC_ASYNC_HPP__
 
+#include <cassert>
 #include <functional>
 #include <vector>
 

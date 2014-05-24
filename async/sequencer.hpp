@@ -73,7 +73,7 @@ void sequencer(TIter items_begin, TIter items_end,
 
     state->callbacks_outstanding++;
 
-    printf("spawning: index: %d \n", state->item_index);
+    //    printf("spawning: index: %d \n", state->item_index);
 
     auto item = *state->item_iter;
     state->item_iter++;
@@ -84,7 +84,7 @@ void sequencer(TIter items_begin, TIter items_end,
 
           state->callbacks_outstanding--;
 
-          printf("outstanding: %d  limit: %d\n", state->callbacks_outstanding, state->limit);
+          //          printf("outstanding: %d  limit: %d\n", state->callbacks_outstanding, state->limit);
 
           assert(state->callbacks_outstanding < state->limit);
 
@@ -128,15 +128,16 @@ void sequencer(TIter items_begin, TIter items_end,
             // We'd spawned as many items as our limit allows.  Since this callback
             // completed, we can spawn one more.
             if (state->item_index < num_items) {
-              printf("spawn from CB\n");
+              //              printf("spawn from CB\n");
               state->spawn_one();
             }
           }
         });
   };
 
-  while (state->callbacks_outstanding < state->limit && !state->stop && state->item_index < num_items) {
-    printf("in main loop\n");
+  while (state->callbacks_outstanding < state->limit && !state->stop &&
+      state->item_index < num_items) {
+    //    printf("in main loop\n");
     state->spawn_one();
   }
 }

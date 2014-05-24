@@ -3,7 +3,6 @@
 #ifndef __ASYNC_SERIES_HPP__
 #define __ASYNC_SERIES_HPP__
 
-#include <cassert>
 #include <iostream>
 #include <string>
 
@@ -18,17 +17,6 @@ using SeriesTask = std::function<void(TaskCallback<T>&)>;
 
 template<typename T>
 using SeriesTaskVector = std::vector<SeriesTask<T>>;
-
-// This value can be asserted to equal zero if there's no pending series callbacks.
-// Otherwise, if it's non-zero after all series callbacks have executed, we have a memory
-// leak.
-namespace priv {
-int series_state_count;
-}
-
-int get_series_state_count() {
-  return priv::series_state_count;
-}
 
 /**
    `series` runs a sequence of tasks, one after the other.  Each task is a std::function,
