@@ -28,27 +28,21 @@ void sequencer(TIter items_begin, TIter items_end,
         std::function<void(bool keep_going, ErrorCode error)> callback_done)> callback,
     std::function<void(ErrorCode error)> final_callback) {
 
-  size_t num_items = items_end - items_begin;
-
   // If no items, invoke the final callback immediately with a success code.
   // This is easier than ensuring the complex logic below does the right thing for
   // an empty iterator.
-  if (num_items == 0) {
+  if (items_begin == items_end) {
     final_callback(async::OK);
     return;
-  }
-
-  if (limit == 0 || limit > num_items) {
-    limit = num_items;
   }
 
   struct State {
     std::shared_ptr<State> keep_alive;
     TIter item_iter;
+    TIter items_end;
     unsigned int limit;
     unsigned int item_index = 0;
     unsigned int callbacks_outstanding = 0;
-    unsigned int num_completed = 0;
     bool stop = false;
     std::function<void()> spawn_one;
 
@@ -65,34 +59,34 @@ void sequencer(TIter items_begin, TIter items_end,
 
   state->keep_alive = state;
   state->item_iter = items_begin;
+  state->items_end = items_end;
   state->limit = limit;
 
   state->spawn_one = [callback, final_callback,
-      &items_end, num_items, state]() mutable {
+      &items_end, state]() mutable {
 
     state->callbacks_outstanding++;
 
     //    printf("spawning: index: %d \n", state->item_index);
 
     auto item = *state->item_iter;
+    bool is_last_item = state->item_iter == state->items_end;
     state->item_iter++;
     state->item_index++;
 
-    callback(item, state->item_index - 1, state->item_index == num_items,
-        [final_callback, num_items, state] (bool keep_going, ErrorCode error) {
+    callback(item, state->item_index - 1, is_last_item,
+        [final_callback, state] (bool keep_going, ErrorCode error) {
 
           state->callbacks_outstanding--;
 
           //          printf("outstanding: %d  limit: %d\n", state->callbacks_outstanding, state->limit);
 
-          assert(state->callbacks_outstanding < state->limit);
+          assert(state->limit == 0 || state->callbacks_outstanding < state->limit);
 
           if (state->stop) {
             // We've already been instructed to stop by some earlier callback.
             return;
           }
-
-          state->num_completed++;
 
           if (!keep_going) {
             // If callback says to stop, then stop.  But don't ever set this variable back to
@@ -100,7 +94,8 @@ void sequencer(TIter items_begin, TIter items_end,
             state->stop = true;
           }
 
-          if (state->stop || state->num_completed == num_items) {
+          if (state->stop ||
+              (state->callbacks_outstanding == 0 && state->item_iter == state->items_end)) {
             // All done.
 
             final_callback(error);
@@ -123,10 +118,10 @@ void sequencer(TIter items_begin, TIter items_end,
             state->spawn_one = [](){};
 
             state->keep_alive.reset();
-          } else if (state->callbacks_outstanding == state->limit - 1) {
+          } else if (state->limit != 0 && state->callbacks_outstanding == state->limit - 1) {
             // We'd spawned as many items as our limit allows.  Since this callback
             // completed, we can spawn one more.
-            if (state->item_index < num_items) {
+            if (state->item_iter != state->items_end) {
               //              printf("spawn from CB\n");
               state->spawn_one();
             }
@@ -134,8 +129,9 @@ void sequencer(TIter items_begin, TIter items_end,
         });
   };
 
-  while (state->callbacks_outstanding < state->limit && !state->stop &&
-      state->item_index < num_items) {
+  while ((state->limit == 0 || state->callbacks_outstanding < state->limit) &&
+      !state->stop &&
+      state->item_iter != state->items_end) {
     //    printf("in main loop\n");
     state->spawn_one();
   }
