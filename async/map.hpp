@@ -24,7 +24,7 @@ void map(std::vector<T> objects,
   auto objects_begin = begin(objects);
   auto objects_end = end(objects);
 
-  auto callback = [results, func](T object, int index, bool is_last_time, int& data_dummy,
+  auto callback = [results, func](T object, int index, bool is_last_time,
       std::function<void(bool, ErrorCode)> callback_done) {
 
     TaskCallback<T> task_callback = [callback_done, results, index](ErrorCode error, T result) {
@@ -35,14 +35,13 @@ void map(std::vector<T> objects,
     func(object, task_callback);
   };
 
-  auto wrapped_final_callback = [results, final_callback](ErrorCode error, int& data_dummy) {
+  auto wrapped_final_callback = [results, final_callback](ErrorCode error) {
     final_callback(error, *results);
     delete results;
   };
 
-  int data = 0;
-  sequencer<T, decltype(objects_begin), int>
-      (objects_begin, objects_end, task_limit, data, callback, wrapped_final_callback);
+  sequencer<T, decltype(objects_begin)>
+      (objects_begin, objects_end, task_limit, callback, wrapped_final_callback);
 }
 
 }

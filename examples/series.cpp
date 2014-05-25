@@ -6,7 +6,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  async::SeriesTaskVector<int> tasks {
+  async::TaskVector<int> tasks {
     [](async::TaskCallback<int> callback) {
       callback(async::OK, 1);
     },

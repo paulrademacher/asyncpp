@@ -21,13 +21,12 @@ int get_sequencer_state_count() {
  *      effect and the items proceed serially.  Set `limit` to 0 to indicate
  *      no limit on max number of asynchronous outstanding items.
  */
-template <typename T, typename TIter, typename CustomData>
+template <typename T, typename TIter>
 void sequencer(TIter items_begin, TIter items_end,
     unsigned int limit,
-    CustomData& data,
-    std::function<void(T item, int index, bool is_last_item, CustomData& data,
+    std::function<void(T item, int index, bool is_last_item,
         std::function<void(bool keep_going, ErrorCode error)> callback_done)> callback,
-    std::function<void(ErrorCode error, CustomData& data)> final_callback) {
+    std::function<void(ErrorCode error)> final_callback) {
 
   size_t num_items = items_end - items_begin;
 
@@ -35,7 +34,7 @@ void sequencer(TIter items_begin, TIter items_end,
   // This is easier than ensuring the complex logic below does the right thing for
   // an empty iterator.
   if (num_items == 0) {
-    final_callback(async::OK, data);
+    final_callback(async::OK);
     return;
   }
 
@@ -68,7 +67,7 @@ void sequencer(TIter items_begin, TIter items_end,
   state->item_iter = items_begin;
   state->limit = limit;
 
-  state->spawn_one = [callback, &data, final_callback,
+  state->spawn_one = [callback, final_callback,
       &items_end, num_items, state]() mutable {
 
     state->callbacks_outstanding++;
@@ -79,8 +78,8 @@ void sequencer(TIter items_begin, TIter items_end,
     state->item_iter++;
     state->item_index++;
 
-    callback(item, state->item_index - 1, state->item_index == num_items, data,
-        [&data, final_callback, num_items, state] (bool keep_going, ErrorCode error) {
+    callback(item, state->item_index - 1, state->item_index == num_items,
+        [final_callback, num_items, state] (bool keep_going, ErrorCode error) {
 
           state->callbacks_outstanding--;
 
@@ -104,7 +103,7 @@ void sequencer(TIter items_begin, TIter items_end,
           if (state->stop || state->num_completed == num_items) {
             // All done.
 
-            final_callback(error, data);
+            final_callback(error);
 
             // Break circular dependency, so state can release.
             //

@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test1) {
       BOOST_CHECK_EQUAL(error, async::OK);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task1, task2, task3 };
+    std::vector<async::Task<int>> tasks = { task1, task2, task3 };
     async::series<int>(tasks, completion_callback);
   }
   BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test2) {
       BOOST_CHECK_EQUAL(error, async::OK);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task1, task2, task_deferred_initiate, task3 };
+    std::vector<async::Task<int>> tasks = { task1, task2, task_deferred_initiate, task3 };
     async::series<int>(tasks, completion_callback);
 
     // Here we're doing some other work until we're ready to invoke the callback.
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(test3) {
       BOOST_CHECK_EQUAL(error, async::OK);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task_deferred_initiate, task_deferred_initiate, task_deferred_initiate };
+    std::vector<async::Task<int>> tasks = { task_deferred_initiate, task_deferred_initiate, task_deferred_initiate };
     async::series<int>(tasks, completion_callback);
 
     // Here we're doing some other work until we're ready to invoke the callback.
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test4) {
       BOOST_CHECK_EQUAL(error, async::OK);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task_deferred_initiate, task1, task_deferred_initiate };
+    std::vector<async::Task<int>> tasks = { task_deferred_initiate, task1, task_deferred_initiate };
     async::series<int>(tasks, completion_callback);
 
     // Here we're doing some other work until we're ready to invoke the callback.
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_error_code) {
       BOOST_CHECK_EQUAL(error, async::FAIL);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task1, task2, task_fail, task3 };
+    std::vector<async::Task<int>> tasks = { task1, task2, task_fail, task3 };
     async::series<int>(tasks, completion_callback);
   }
   BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(test_error_code2) {
       BOOST_CHECK_EQUAL(error, async::FAIL);
     };
 
-    std::vector<async::SeriesTask<int>> tasks = { task_fail };
+    std::vector<async::Task<int>> tasks = { task_fail };
     async::series<int>(tasks, completion_callback);
   }
   BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);

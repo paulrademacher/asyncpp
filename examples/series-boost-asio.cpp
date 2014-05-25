@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   boost::asio::io_service io_service;
   boost::asio::deadline_timer timer(io_service);
 
-  async::SeriesTaskVector<int> tasks {
+  async::TaskVector<int> tasks {
     [&timer](async::TaskCallback<int> callback) {
       timer.expires_from_now(seconds(1));
       timer.async_wait([=] (const boost::system::error_code& error) {

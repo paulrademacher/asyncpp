@@ -26,9 +26,16 @@ using TaskCompletionCallback = std::function<void(ErrorCode, std::vector<T>&)>;
 template<typename T>
 void noop_task_final_callback(ErrorCode e, std::vector<T> p) {};
 
+template <typename T>
+using Task = std::function<void(TaskCallback<T>&)>;
+
+template<typename T>
+using TaskVector = std::vector<Task<T>>;
+
 }
 
 #include "map.hpp"
+#include "parallel.hpp"
 #include "series.hpp"
 #include "sequencer.hpp"
 
