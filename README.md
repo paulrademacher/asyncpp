@@ -92,4 +92,4 @@ test/series-boost-asio.cpp
 
 ---------
 
-Made with :rage: by Paul Rademacher.
+Made with :horse: by Paul Rademacher.
