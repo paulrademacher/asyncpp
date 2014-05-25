@@ -12,6 +12,7 @@ examples = [
     env.Program(target="bin/series-boost-asio", source=["examples/series-boost-asio.cpp"]),
     env.Program(target="bin/map", source=["examples/map.cpp"]),
     env.Program(target="bin/sequencer", source=["examples/sequencer.cpp"]),
+    env.Program(target="bin/whilst", source=["examples/whilst.cpp"]),
     ]
 
 tests = [

@@ -38,5 +38,6 @@ using TaskVector = std::vector<Task<T>>;
 #include "parallel.hpp"
 #include "series.hpp"
 #include "sequencer.hpp"
+#include "whilst.hpp"
 
 #endif
