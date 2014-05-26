@@ -65,19 +65,47 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
     async::series<int>(tasks);
 
 
-### Requirements
-
-* C++11.
-* Boost, for examples.
-* SCons, to build examples and tests.
-
 ### Control flow
 
+* [`series`](#series)
+* [`parallel`](#parallel)
+* [`parallelLimit`](#parallelLimit)
+* [`whilst`](#whilst)
+* [`doWhilst`](#doWhilst)
+* [`until`](#until)
+* [`doUntil`](#doUntil)
+* [`forever`](#forever)
+
+<a name="series" />
 #### series
 
-Invokes a series of tasks, and collects result values into a vector.    As each task completes, it invokes a callback with an error code and a result value.    If the error code is not `async::OK`, iteration stops.    Once all tasks complete or there is an error, `final_callback` is called with the last error and the results vector.
+Invokes a series of tasks, and collects result values into a vector. As each task completes, it invokes a callback with an error code and a result value. If the error code is not `async::OK`, iteration stops. Once all tasks complete or there is an error, `final_callback` is called with the last error and the results vector.
 
 Each task may invoke its callback immediately, or at some point in the future.
+
+<a name="parallel" />
+#### parallel
+
+<a name="parallelLimit" />
+#### parallelLimit
+
+<a name="whilst" />
+#### whilst
+
+<a name="doWhilst" />
+#### doWhilst
+
+<a name="until" />
+#### until
+
+<a name="doUntil" />
+#### doUntil
+
+<a name="forever" />
+#### forever
+
+
+
 
 ### Examples
 
@@ -85,6 +113,12 @@ Build using `scons`.
 
     test/series.cpp
     test/series-boost-asio.cpp
+
+### Requirements
+
+* C++11.
+* Boost, for examples.
+* SCons, to build examples and tests.
 
 
 ---------
