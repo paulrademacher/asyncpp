@@ -1,0 +1,4 @@
+* No elements
+* limit < # outstanding
+* ==
+* limit == #out + 1

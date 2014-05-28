@@ -27,13 +27,3 @@ int main(int argc, char *argv[]) {
           final_callback);
   return 0;
 }
-
-/*** UNIT TEST:
-
-* No elements
-* limit < # outstanding
-* ==
-* limit == #out + 1
-
-
-****/
