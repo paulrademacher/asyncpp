@@ -65,19 +65,23 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
     async::series<int>(tasks);
 
 
-### Control flow
+### Functions
 
-* [`series`](#series)
-* [`parallel`](#parallel)
-* [`parallelLimit`](#parallelLimit)
-* [`whilst`](#whilst)
-* [`doWhilst`](#doWhilst)
-* [`until`](#until)
-* [`doUntil`](#doUntil)
-* [`forever`](#forever)
+Function | Concurrency | Executes vector<br> of functions | Applies single function<br>to data vector | Returns vector <br>of results
+--------------------------------- | :---: | :---: | :---: | :---:
+[`map`](#map)                     | limit = _n_ | no | yes | yes
+[`series`](#series)               | 1 | yes | no | yes
+[`parallel`](#parallel)           | no limit | yes | no | yes
+[`parallelLimit`](#parallelLimit)  | limit = _n_ | yes | no | yes
+[`whilst`](#whilst)               | 1 | no | no | no
+[`doWhilst`](#doWhilst)           | 1 | no | no | no
+[`until`](#until)                 | 1 | no | no | no
+[`doUntil`](#doUntil)             | 1 | no | no | no
+[`forever`](#forever)             | 1 | no | no | no
 
 <a name="series" />
 #### series
+</a>
 
 Invokes a series of tasks, and collects result values into a vector. As each task completes, it invokes a callback with an error code and a result value. If the error code is not `async::OK`, iteration stops. Once all tasks complete or there is an error, `final_callback` is called with the last error and the results vector.
 

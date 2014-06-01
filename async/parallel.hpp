@@ -68,7 +68,6 @@ void parallel_limit(std::vector<Task<T>> &tasks,
 
 template<typename T>
 void parallel(std::vector<Task<T>> &tasks,
-    unsigned int limit,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>) {
 
   parallel_limit(tasks, 0, final_callback);
