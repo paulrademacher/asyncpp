@@ -9,20 +9,18 @@ namespace async {
 
 // TODO: Make versions that take reference and also another with by-value callbacks, to
 // support lambda decls inline in function calls.
+// TODO: Fix comment below once ref vs by-val is resolved.
 
-// `objects`, `func`, and `final_callback` are passed by reference.  It is the
+// `data`, `func`, and `final_callback` are passed by reference.  It is the
 // responsibility of the caller to ensure that their lifetime exceeds the lifetime of the
 // series call.
 template<typename T>
-void map(std::vector<T> objects,
+void map(std::vector<T> data,
     std::function<void(T, TaskCallback<T>)> func,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
     unsigned int task_limit=0) {
 
-  std::vector<T>* results = new std::vector<T>(objects.size());
-
-  auto objects_begin = begin(objects);
-  auto objects_end = end(objects);
+  std::vector<T>* results = new std::vector<T>(data.size());
 
   auto callback = [results, func](T object, int index, bool is_last_time,
       std::function<void(bool, ErrorCode)> callback_done) {
@@ -40,8 +38,8 @@ void map(std::vector<T> objects,
     delete results;
   };
 
-  sequencer<T, decltype(objects_begin)>
-      (objects_begin, objects_end, task_limit, callback, wrapped_final_callback);
+  sequencer<T>
+      (data.begin(), data.end(), task_limit, callback, wrapped_final_callback);
 }
 
 }

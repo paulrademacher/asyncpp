@@ -6,9 +6,9 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  std::vector<int> objects { 1, 2, 3, 4, 5, 6, 7 };
+  std::vector<int> data { 1, 2, 3, 4, 5, 6, 7 };
 
-  async::map<int>(objects,
+  async::map<int>(data,
       [](int value, async::TaskCallback<int> callback) {
         callback(async::OK, value * value);
       },

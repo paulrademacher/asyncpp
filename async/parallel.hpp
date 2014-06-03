@@ -40,9 +40,6 @@ void parallel_limit(std::vector<Task<T>> &tasks,
 
   std::vector<T>* results = new std::vector<T>();
 
-  auto tasks_begin = begin(tasks);
-  auto tasks_end = end(tasks);
-
   auto callback = [results](Task<T> task, int index, bool is_last_time,
       std::function<void(bool, ErrorCode)> callback_done) {
 
@@ -58,8 +55,8 @@ void parallel_limit(std::vector<Task<T>> &tasks,
     delete results;
   };
 
-  sequencer<Task<T>, decltype(tasks_begin)>
-      (tasks_begin, tasks_end, limit, callback, wrapped_final_callback);
+  sequencer<Task<T>>
+      (tasks.begin(), tasks.end(), limit, callback, wrapped_final_callback);
 }
 
 /**

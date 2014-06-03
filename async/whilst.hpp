@@ -4,6 +4,7 @@
 #define __ASYNC_WHILST_HPP__
 
 #include "forever_iterator.hpp"
+#include "sequencer.hpp"
 
 namespace async {
 
@@ -83,7 +84,6 @@ void doUntil(const std::function<void(std::function<void(ErrorCode)>)>& func,
    Perform task until `func` does not pass `OK` to its callback.  Uses `do..while` control flow.  This is inverse of `doWhilst`.
  */
 void forever(const std::function<void(std::function<void(ErrorCode)>)>& func,
-    const std::function<bool()>& test,
     const std::function<void(ErrorCode)>& final_callback=noop_whilst_final_callback) {
   whilst([]() { return true; }, func, final_callback);
 }

@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   auto callback = [](int item, int index, bool is_last_time,
       std::function<void(bool, async::ErrorCode)> callback_done) {
 
-    printf("%d %d %d %d\n", item, index, is_last_time);
+    printf("%d %d %d\n", item, index, is_last_time);
 
     if (item > 40)
       callback_done(true, async::OK);
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     printf("DONE\n");
   };
 
-  async::sequencer<int, std::vector<int>::iterator>
+  async::sequencer<int>
       (ints.begin(), ints.end(), 5, callback,
           final_callback);
   return 0;

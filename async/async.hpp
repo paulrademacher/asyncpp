@@ -24,7 +24,7 @@ template<typename T>
 using TaskCompletionCallback = std::function<void(ErrorCode, std::vector<T>&)>;
 
 template<typename T>
-void noop_task_final_callback(ErrorCode e, std::vector<T> p) {};
+void noop_task_final_callback(ErrorCode e, std::vector<T>& p) {};
 
 template <typename T>
 using Task = std::function<void(TaskCallback<T>&)>;
@@ -32,8 +32,11 @@ using Task = std::function<void(TaskCallback<T>&)>;
 template<typename T>
 using TaskVector = std::vector<Task<T>>;
 
+using BoolCallback = std::function<void(bool)>;
+
 }
 
+#include "filter.hpp"
 #include "map.hpp"
 #include "parallel.hpp"
 #include "series.hpp"
