@@ -149,7 +149,7 @@ Executes a function repetedly, until it passes a non-OK (non-zero) error code to
 
 ### Summary
 
-Function | Concurrency | Executes vec<br> of functions | Applies single function<br>to data vec | Returns vec <br>of results | Output vec <br>same size as <br>input
+Function | Concurrency | Executes vec of functions | Applies single functionto data vec | Returns vec of results | Output vec same size as input
 ------------------------------- | :---:       | :-: | :-: | :-: | :-:
 [each](#each)                   | limit = _n_ | no  | yes | no  | n/a
 [map](#map)                     | limit = _n_ | no  | yes | yes | yes
