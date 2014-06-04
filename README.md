@@ -67,7 +67,8 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
 
 ### Functions
 
-#### each [each]
+[each]
+#### each
 
 Takes an input vector and a function, and applies that function to each element in the vector
 
