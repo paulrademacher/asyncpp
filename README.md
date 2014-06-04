@@ -149,20 +149,20 @@ Executes a function repetedly, until it passes a non-OK (non-zero) error code to
 
 ### Summary
 
-Function | Concurrency | Executes vector<br> of functions | Applies single function<br>to data vector | Returns vector <br>of results | Output vector <br>same size as <br>input
---------------------------------- | :---:       | :-: | :-: | :-: | :-:
-[`each`](#each)                   | limit = _n_ | no  | yes | no  | n/a
-[`map`](#map)                     | limit = _n_ | no  | yes | yes | yes
-[`series`](#series)               | 1           | yes | no  | yes | yes
-[`parallel`](#parallel)           | no limit    | yes | no  | yes | yes
-[`parallelLimit`](#parallelLimit) | limit = _n_ | yes | no  | yes | yes
-[`filter`](#filter)               | limit = _n_ | no  | yes | yes | no
-[`reject`](#reject)               | limit = _n_ | no  | yes | yes | no
-[`whilst`](#whilst)               | 1           | no  | no  | no  | n/a
-[`doWhilst`](#doWhilst)           | 1           | no  | no  | no  | n/a
-[`until`](#until)                 | 1           | no  | no  | no  | n/a
-[`doUntil`](#doUntil)             | 1           | no  | no  | no  | n/a
-[`forever`](#forever)             | 1           | no  | no  | no  | n/a
+Function | Concurrency | Executes vec<br> of functions | Applies single function<br>to data vec | Returns vec <br>of results | Output vec <br>same size as <br>input
+------------------------------- | :---:       | :-: | :-: | :-: | :-:
+[each](#each)                   | limit = _n_ | no  | yes | no  | n/a
+[map](#map)                     | limit = _n_ | no  | yes | yes | yes
+[series](#series)               | 1           | yes | no  | yes | yes
+[parallel](#parallel)           | no limit    | yes | no  | yes | yes
+[parallelLimit](#parallelLimit) | limit = _n_ | yes | no  | yes | yes
+[filter](#filter)               | limit = _n_ | no  | yes | yes | no
+[reject](#reject)               | limit = _n_ | no  | yes | yes | no
+[whilst](#whilst)               | 1           | no  | no  | no  | n/a
+[doWhilst](#doWhilst)           | 1           | no  | no  | no  | n/a
+[until](#until)                 | 1           | no  | no  | no  | n/a
+[doUntil](#doUntil)             | 1           | no  | no  | no  | n/a
+[forever](#forever)             | 1           | no  | no  | no  | n/a
 
 ### Examples
 
