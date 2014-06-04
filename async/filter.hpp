@@ -46,7 +46,7 @@ void filter(std::vector<T>& data,
     }
     printf("\n");
 
-    printf("size: %d\n", results.size());
+    printf("size: %lu\n", results.size());
 
     final_callback(results);
 

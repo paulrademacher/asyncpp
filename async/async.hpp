@@ -34,8 +34,12 @@ using TaskVector = std::vector<Task<T>>;
 
 using BoolCallback = std::function<void(bool)>;
 
+using ErrorCodeCallback = std::function<void(ErrorCode)>;
+void noop_error_code_final_callback(ErrorCode e) {};
+
 }
 
+#include "each.hpp"
 #include "filter.hpp"
 #include "map.hpp"
 #include "parallel.hpp"

@@ -8,6 +8,7 @@ env = Environment(
     LINKFLAGS="-stdlib=libc++")
 
 examples = [
+    env.Program(target="bin/each", source=["examples/each.cpp"]),
     env.Program(target="bin/filter", source=["examples/filter.cpp"]),
     env.Program(target="bin/map", source=["examples/map.cpp"]),
     env.Program(target="bin/sequencer", source=["examples/sequencer.cpp"]),

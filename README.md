@@ -67,11 +67,15 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
 
 ### Functions
 
+#### each [each]
+
+Takes an input vector and a function, and applies that function to each element in the vector
+
 #### map [map]
 
 Takes an input vector and a function, and applies that function to each element in the vector.  Returns (via the final_callback) a new vector with the transformed values.
 
-#### series [series]
+#### series [series] ##
 
 Invokes a series of tasks, and collects result values into a vector. As each task completes, it invokes a callback with an error code and a result value. If the error code is not `async::OK`, iteration stops. Once all tasks complete or there is an error, `final_callback` is called with the last error and the results vector.
 
@@ -122,18 +126,19 @@ Executes a function repetedly, until it passes a non-OK (non-zero) error code to
 ### Summary
 
 Function | Concurrency | Executes vector<br> of functions | Applies single function<br>to data vector | Returns vector <br>of results | Output vector <br>same size as <br>input
--------------------------------- | :---: | :---: | :---: | :---: | :---:
-[`map`][map]                     | limit = _n_ | no | yes | yes | yes
-[`series`][series]               | 1 | yes | no | yes | yes
-[`parallel`][parallel]           | no limit | yes | no | yes | yes
-[`parallelLimit`][parallelLimit] | limit = _n_ | yes | no | yes | yes
-[`filter`][filter]               | limit = _n_ | no | yes | yes | no
-[`reject`][reject]               | limit = _n_ | no | yes | yes | no
-[`whilst`][whilst]               | 1 | no | no | no | n/a
-[`doWhilst`][doWhilst]           | 1 | no | no | no | n/a
-[`until`][until]                 | 1 | no | no | no | n/a
-[`doUntil`][doUntil]             | 1 | no | no | no | n/a
-[`forever`][forever]             | 1 | no | no | no | n/a
+-------------------------------- | :---:       | :-: | :-: | :-: | :-:
+[`each`][each]                   | limit = _n_ | no  | yes | no  | n/a
+[`map`][map]                     | limit = _n_ | no  | yes | yes | yes
+[`series`][series]               | 1           | yes | no  | yes | yes
+[`parallel`][parallel]           | no limit    | yes | no  | yes | yes
+[`parallelLimit`][parallelLimit] | limit = _n_ | yes | no  | yes | yes
+[`filter`][filter]               | limit = _n_ | no  | yes | yes | no
+[`reject`][reject]               | limit = _n_ | no  | yes | yes | no
+[`whilst`][whilst]               | 1           | no  | no  | no  | n/a
+[`doWhilst`][doWhilst]           | 1           | no  | no  | no  | n/a
+[`until`][until]                 | 1           | no  | no  | no  | n/a
+[`doUntil`][doUntil]             | 1           | no  | no  | no  | n/a
+[`forever`][forever]             | 1           | no  | no  | no  | n/a
 
 ### Examples
 

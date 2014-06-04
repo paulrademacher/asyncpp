@@ -15,8 +15,8 @@ void noop_whilst_final_callback(ErrorCode) {};
    callback.  Equivalent to `while` control flow.
  */
 void whilst(const std::function<bool()>& test,
-    const std::function<void(std::function<void(ErrorCode)>)>& func,
-    const std::function<void(ErrorCode)>& final_callback=noop_whilst_final_callback) {
+    const std::function<void(ErrorCodeCallback)>& func,
+    const ErrorCodeCallback& final_callback=noop_whilst_final_callback) {
 
   auto wrapped_callback = [&func, &test](int item, int index, bool is_last_time,
       std::function<void(bool, ErrorCode)> callback_done) {
