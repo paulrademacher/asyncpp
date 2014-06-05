@@ -43,22 +43,38 @@ using boost::posix_time::seconds;
       time_diff.total_milliseconds() < expected + 100); \
   }
 
+void invoke_or_defer(boost::asio::io_service& io_service,
+    std::vector<std::unique_ptr<boost::asio::deadline_timer>>& timers,
+    int timer_seconds, std::function<void()> func) {
+  if (timer_seconds >= 0) {
+    // Use boost::asio.
+    printf("task w/delayed callback: %d seconds\n", timer_seconds);
+    timers.emplace_back(new boost::asio::deadline_timer(io_service));
+    timers.back()->expires_from_now(seconds(timer_seconds));
+    timers.back()->async_wait([=] (const boost::system::error_code& error) {
+          func();
+        });
+  } else {
+    // Negative seconds means return a result immediately and do not
+    // defer this result.
+    func();
+  }
+}
+
 async::Task<int> make_task_callback_no_input(boost::asio::io_service& io_service,
     std::vector<std::unique_ptr<boost::asio::deadline_timer>>& timers,
     int timer_seconds, int output) {
   return [=, &io_service, &timers](async::TaskCallback<int> callback) {
-    if (timer_seconds >= 0) {
-      // Use boost::asio.
-      printf("task: %d %d\n", timer_seconds, output);
-      timers.emplace_back(new boost::asio::deadline_timer(io_service));
-      timers.back()->expires_from_now(seconds(timer_seconds));
-      timers.back()->async_wait([=] (const boost::system::error_code& error) {
-            callback(async::OK, output);
-          });
-    } else {
-      // Negative seconds means return a result immediately and do not
-      // defer this result.
-      callback(async::OK, output);
-    }
+    invoke_or_defer(io_service, timers, timer_seconds,
+        [=]() { callback(async::OK, output); });
+  };
+}
+
+async::MapCallback<int> make_task_callback_square(boost::asio::io_service& io_service,
+    std::vector<std::unique_ptr<boost::asio::deadline_timer>>& timers,
+    int timer_seconds) {
+  return [=, &io_service, &timers](int input, async::TaskCallback<int> callback) {
+    invoke_or_defer(io_service, timers, timer_seconds,
+        [=]() { callback(async::OK, input * input); });
   };
 }

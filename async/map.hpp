@@ -7,16 +7,20 @@
 
 namespace async {
 
+template<typename T>
+using MapCallback = std::function<void(T, TaskCallback<T>)>;
+
 // TODO: Make versions that take reference and also another with by-value callbacks, to
 // support lambda decls inline in function calls.
+// Note that by-value capture of a vec needs to be retained for async calls.
 // TODO: Fix comment below once ref vs by-val is resolved.
 
-// `data`, `func`, and `final_callback` are passed by reference.  It is the
+// `data and `final_callback` are passed by reference.  It is the
 // responsibility of the caller to ensure that their lifetime exceeds the lifetime of the
 // series call.
 template<typename T>
-void map(std::vector<T> data,
-    std::function<void(T, TaskCallback<T>)> func,
+void map(std::vector<T>& data,
+    MapCallback<T> func,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
     unsigned int task_limit=0) {
 
