@@ -15,6 +15,7 @@ examples = [
     env.Program(target="bin/series", source=["examples/series.cpp"]),
     env.Program(target="bin/series-boost-asio", source=["examples/series-boost-asio.cpp"]),
     env.Program(target="bin/whilst", source=["examples/whilst.cpp"]),
+    env.Program(target="bin/http-client", source=["examples/http-client.cpp"]),
     ]
 
 tests = [
