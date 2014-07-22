@@ -13,7 +13,7 @@ namespace http_client {
 
 class MalformedUriException : public std::invalid_argument {
 public:
-  explicit MalformedUriException() : std::invalid_argument("malformed-uri") {};
+  explicit MalformedUriException(const char* msg) : std::invalid_argument(std::string(msg)) {};
 };
 
 class AsyncHttpClient {

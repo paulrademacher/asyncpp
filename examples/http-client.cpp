@@ -4,14 +4,12 @@
 
 #include "http-client.hpp"
 
-#include "utils.hpp"
-
 // Based on boost_lib/boost_1_55_0/doc/html/boost_asio/example/cpp03/http/client/async_client.cpp
 //     by Christopher M. Kohlhoff (chris at kohlhoff dot com)
 
 namespace http_client {
 
-namespace utils {
+namespace util {
 
 std::string substr(const std::string &string, size_t pos, size_t len=0) {
   if (pos == std::string::npos) {
@@ -48,33 +46,33 @@ AsyncHttpClient::AsyncHttpClient(const std::string& uri,
   std::string uri_without_protocol;
 
   if (boost::algorithm::starts_with(uri_, "http://")) {
-    uri_without_protocol = utils::substr(uri_, 7);
+    uri_without_protocol = util::substr(uri_, 7);
   } else if (boost::algorithm::starts_with(uri_, "https://")) {
-    uri_without_protocol = utils::substr(uri_, 8);
+    uri_without_protocol = util::substr(uri_, 8);
     is_http = false;
   } else {
-    throw MalformedUriException();
+    throw MalformedUriException("Needs http:// or https://");
   }
 
   if (uri_without_protocol.length() == 0) {
-    throw MalformedUriException();
+    throw MalformedUriException("url length is zero");
   }
 
   size_t path_start = uri_without_protocol.find_first_of("/");
-  std::string server_and_port = utils::substr(uri_without_protocol, 0, path_start);
+  std::string server_and_port = util::substr(uri_without_protocol, 0, path_start);
   path_ = path_start != std::string::npos ?
-      utils::substr(uri_without_protocol, path_start) : "/";
+      util::substr(uri_without_protocol, path_start) : "/";
 
   if (server_and_port.length() == 0) {
-    throw MalformedUriException();
+    throw MalformedUriException("server and port empty");
   }
 
   int colon = server_and_port.find_first_of(":");
-  server_ = utils::substr(server_and_port, 0, colon);
+  server_ = util::substr(server_and_port, 0, colon);
 
   std::string port_string;
   if (colon != std::string::npos) {
-    port_string = utils::substr(server_and_port, colon + 1);
+    port_string = util::substr(server_and_port, colon + 1);
   }
   port_ = port_string.length() > 0 ?
       std::stoi(port_string) : (is_http ? 80 : 443);
