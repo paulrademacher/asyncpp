@@ -168,7 +168,7 @@ Function | Concurrency | Executes vec of functions | Applies single function to 
 
 Build using `scons`.  Binaries will be in `bin/` directory.
 
-Examples are in (/examples)[/examples] directory.
+Examples are in [/examples](/examples) directory.
 
 Run tests with `scons test`.
 
