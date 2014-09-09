@@ -46,8 +46,6 @@ private:
   std::string path_;
   boost::asio::ip::tcp::resolver::iterator endpoint_iterator_;
 
-  void read_content(const boost::system::error_code& err, const std::size_t bytes_transferred);
-
   boost::asio::ip::tcp::resolver resolver_;
   boost::asio::ip::tcp::socket socket_;
   boost::asio::streambuf request_;

@@ -132,8 +132,6 @@ void AsyncHttpClient::fetch(std::function<std::string()> callback) {
       // Attempt a connection to each endpoint in the list until we
       // successfully establish a connection.
 
-      // TODO: Does this do multiple connects??
-
       boost::asio::async_connect(socket_, endpoint_iterator_,
           [=](const boost::system::error_code& err,
               boost::asio::ip::tcp::resolver::iterator endpoint_iterator) {
@@ -273,23 +271,6 @@ void AsyncHttpClient::fetch(std::function<std::string()> callback) {
       });
 
   io_service_.run();
-}
-
-void AsyncHttpClient::read_content(const boost::system::error_code& err,
-    const std::size_t bytes_transferred) {
-  if (!err) {
-    content_ << &response_;
-
-    // Continue reading remaining data until EOF.
-    boost::asio::async_read(socket_, response_,
-        boost::asio::transfer_at_least(1),
-        [this](const boost::system::error_code& err, const std::size_t bytes_transferred) {
-          read_content(err, bytes_transferred);
-        });
-  } else {
-    // Write all of the data that has been read so far.
-    std::cout << content_.str() << std::endl;
-  }
 }
 
 }
