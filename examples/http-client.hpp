@@ -9,6 +9,8 @@
 
 #include <boost/asio.hpp>
 
+#include "../async/async.hpp"
+
 namespace http_client {
 
 class MalformedUriException : public std::invalid_argument {
@@ -42,6 +44,7 @@ private:
   std::stringstream content_;
   int port_;
   std::string path_;
+  boost::asio::ip::tcp::resolver::iterator endpoint_iterator_;
 
   void read_content(const boost::system::error_code& err, const std::size_t bytes_transferred);
 
