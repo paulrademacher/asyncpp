@@ -7,11 +7,14 @@
 #include <functional>
 #include <vector>
 
+#include "debug.hpp"
+
 namespace async {
 
 typedef enum {
   OK = 0,
-  FAIL = -1
+  FAIL = -1,
+  STOP = -2
 } ErrorCode;
 
 template<typename T>

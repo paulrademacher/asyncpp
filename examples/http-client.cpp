@@ -102,24 +102,6 @@ void AsyncHttpClient::fetch(std::function<std::string()> callback) {
   std::cout << "Accept: */*\r\n";
   std::cout << "Connection: close\r\n\r\n";
 
-  /* Steps:
-     - Resolve
-     - Connect
-     - Write request
-     - Read response status line (until "\r\n")
-     - Read response headers (until "\r\n\r\n")
-     - Read content until EOF.
-  */
-
-  /*
-    async::TaskVector<int> tasks {
-    [](async::TaskCallback<int> callback) {
-    callback(async::OK, 1);
-    },
-  */
-
-  //  void resolve_func[](async::TaskCallback<int> callback);
-
   async::TaskVector<int> steps {
     /*************************************************************
      * Step 1: Resolve the URL.
@@ -259,46 +241,26 @@ void AsyncHttpClient::fetch(std::function<std::string()> callback) {
       std::cout << std::endl;
 
       // Read data until EOF.
-      async::forever([this, &final_callback](async::ErrorCodeCallback keep_reading_callback) {
-            keep_reading_callback(async::OK);
-            printf("1\n");
-            if (false)
+      async::forever([this, final_callback](async::ErrorCodeCallback keep_reading_callback) {
             boost::asio::async_read(socket_, response_,
                 boost::asio::transfer_at_least(1),
                 [this, final_callback, keep_reading_callback](const boost::system::error_code& err,
                     const std::size_t bytes_transferred) {
 
-                  printf("2\n");
                   if (response_.size() > 0) {
-                    printf("3\n");
                     content_ << &response_;
-                    printf("4\n");
                   }
 
                   if (err) {
-                    printf("5\n");
-
                     keep_reading_callback(async::STOP);
-
-                    printf("6\n");
 
                     // Stop the main execution sequence.
                     final_callback(err == boost::asio::error::eof ? async::OK : async::FAIL, 6);
-
-                    printf("7\n");
-
                   } else {
-                    printf("8\n");
-
                     keep_reading_callback(async::OK);
-
-                    printf("9\n");
                   }
-                  printf("10\n");
-
-                });
-            printf("11\n");
-          });
+                });  // async_read()
+          });  // forever()
     }
   };
 
@@ -333,6 +295,11 @@ void AsyncHttpClient::read_content(const boost::system::error_code& err,
 }
 
 int main(int argc, char* argv[]) {
+  if (argc != 2) {
+    std::cerr << "USAGE: " << argv[0] << " URL" << std::endl;
+    return 1;
+  }
+
   http_client::AsyncHttpClient client(argv[1], "GET");
   client.fetch(nullptr);
 

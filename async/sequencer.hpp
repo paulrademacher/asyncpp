@@ -44,6 +44,7 @@ void sequencer(TIter items_begin, TIter items_end,
     unsigned int item_index = 0;
     unsigned int callbacks_outstanding = 0;
     bool stop = false;
+    bool in_main_loop;
     std::function<void()> spawn_one;
 
     State() {
@@ -67,8 +68,6 @@ void sequencer(TIter items_begin, TIter items_end,
 
     state->callbacks_outstanding++;
 
-    //    printf("spawning: index: %d \n", state->item_index);
-
     auto item = *state->item_iter;
     bool is_last_item = state->item_iter == state->items_end;
     state->item_iter++;
@@ -78,8 +77,6 @@ void sequencer(TIter items_begin, TIter items_end,
         [final_callback, state] (bool keep_going, ErrorCode error) {
 
           state->callbacks_outstanding--;
-
-          //          printf("outstanding: %d  limit: %d\n", state->callbacks_outstanding, state->limit);
 
           assert(state->limit == 0 || state->callbacks_outstanding < state->limit);
 
@@ -122,19 +119,30 @@ void sequencer(TIter items_begin, TIter items_end,
             // We'd spawned as many items as our limit allows.  Since this callback
             // completed, we can spawn one more.
             if (state->item_iter != state->items_end) {
-              //              printf("spawn from CB\n");
-              state->spawn_one();
+              if (!state->in_main_loop) {
+                // We're not inside the main loop, which means we are currently in an
+                // asynchronous callback.  Spawn the next item in the sequence directly
+                // from here.  Otherwise, if we're inside the main loop, the next item
+                // will get spawned once this function returns.
+                state->spawn_one();
+
+                // TODO: For better stack management, this should be a loop and not just a
+                // single spawn, applying the same logic to not spawn internally but from
+                // the parent loop.  This way, if an async callback contains a lot of sync tasks,
+                // we won't blow the stack.
+              }
             }
           }
         });
   };
 
+  state->in_main_loop = true;
   while ((state->limit == 0 || state->callbacks_outstanding < state->limit) &&
       !state->stop &&
       state->item_iter != state->items_end) {
-    //    printf("in main loop\n");
     state->spawn_one();
   }
+  state->in_main_loop = false;
 }
 
 }

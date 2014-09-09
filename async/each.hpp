@@ -11,7 +11,7 @@ namespace async {
 // responsibility of the caller to ensure that their lifetime exceeds the lifetime of the
 // series call.
 template<typename T>
-void each(std::vector<T> data,
+void each(std::vector<T> &data,
     std::function<void(T, ErrorCodeCallback)> func,
     const ErrorCodeCallback &final_callback=noop_error_code_final_callback,
     unsigned int task_limit=0) {

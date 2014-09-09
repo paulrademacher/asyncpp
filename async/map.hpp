@@ -19,7 +19,7 @@ using MapCallback = std::function<void(T, TaskCallback<T>)>;
 // responsibility of the caller to ensure that their lifetime exceeds the lifetime of the
 // series call.
 template<typename T>
-void map(std::vector<T>& data,
+void map(std::vector<T> &data,
     MapCallback<T> func,
     const TaskCompletionCallback<T> &final_callback=noop_task_final_callback<T>,
     unsigned int task_limit=0) {
