@@ -166,10 +166,12 @@ Function | Concurrency | Executes vec of functions | Applies single function to 
 
 ### Examples
 
-Build using `scons`.
+Build using `scons`.  Binaries will be in `bin/` directory.
 
-    test/series.cpp
-    test/series-boost-asio.cpp
+Examples are in (/examples)[/examples] directory.
+
+Run tests with `scons test`.
+
 
 ### Requirements
 
