@@ -1,6 +1,6 @@
 env = Environment(
     CXX="c++",
-    CCFLAGS="-g -std=c++11 -stdlib=libc++", ## -Weverything",
+    CCFLAGS="-g -std=c++11 -stdlib=libc++",
 
     # /usr/local/lib
     LIBS=["boost_system", "boost_regex-mt", "boost_thread-mt", "boost_coroutine-mt"],
