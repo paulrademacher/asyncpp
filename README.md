@@ -106,27 +106,27 @@ We've completely generalized the pattern of multiple calls to an sync function, 
 Here's an example using the Boost ASIO network library.  Instead of writing:
 
 ```
-    resolver.async_resolve(query, [=](error_code& err, ...) {
+resolver.async_resolve(query, [=](error_code& err, ...) {
+    // Do stuff, then:
+    asio::async_connect(socket, iter, [=](error_code& err, ...) {
         // Do stuff, then:
-        asio::async_connect(socket, iter, [=](error_code& err, ...) {
+        asio::async_write(socket, request, [=](error_code& err, ...) {
             // Do stuff, then:
-            asio::async_write(socket, request, [=](error_code& err, ...) {
+            asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                 // Do stuff, then:
                 asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                     // Do stuff, then:
                     asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                         // Do stuff, then:
-                        asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
-                            // Do stuff, then:
-                            asio::async_read_until(socket, response, "\r\n\r\n", [=](error_code& err, ...) {
-                                // Keep nesting and nesting until your tab key breaks :-(
-                            }
+                        asio::async_read_until(socket, response, "\r\n\r\n", [=](error_code& err, ...) {
+                            // Keep nesting and nesting until your tab key breaks :-(
                         }
                     }
                 }
             }
         }
     }
+}
 ```
 
 with **asyncpp** we can instead write this as a flat sequence of steps:
