@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     callback(async::OK);
   };
 
-  async::forever(func);
+  async::ntimes(10, func);
 
   return 0;
 }

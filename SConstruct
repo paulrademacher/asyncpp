@@ -11,6 +11,7 @@ examples = [
     env.Program(target="bin/each", source=["examples/each.cpp"]),
     env.Program(target="bin/filter", source=["examples/filter.cpp"]),
     env.Program(target="bin/forever", source=["examples/forever.cpp"]),
+    env.Program(target="bin/ntimes", source=["examples/ntimes.cpp"]),
     env.Program(target="bin/map", source=["examples/map.cpp"]),
     env.Program(target="bin/sequencer", source=["examples/sequencer.cpp"]),
     env.Program(target="bin/series", source=["examples/series.cpp"]),

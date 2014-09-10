@@ -14,47 +14,63 @@ serial and parallel async ops, then you quickly wind up with a mess of callbacks
 This library helps by packaging several common patterns of async operations, to keep your code
 clean and reasonable.
 
-Here's a contrived example.  Imagine we need to fetch data from a remote server, and want to retry three times.
+Here's a contrived example.  Imagine we have to call 3 blocking functions, in order.  If
+any of the functions returns `false`, we want to return `false to the caller.
 
-First, a version using a blocking network call (easiest to write):
 ```
-int fetch_url_blocking_with_retries(std::string url, int num_retries,
-        std::vector<char> &data) {
-    int status_code;
-    for (int i = 0; i < num_retries; i++) {
-        // Blocks until network returns data, or error.
-        status_code = fetch_url_blocking(url, data);
-        if (status_code == 200) {
-            return 200;
-        }
+bool func1();
+bool func2();
+bool func3();
+
+bool call_functions() {
+    if (!func1()) {
+        return false;
     }
-    return status_code;
+    if (!func2()) {
+        return false;
+    }
+    if (!func3()) {
+        return false;
+    }
+    return true;
 }
 ```
 
-Now what if we wanted to use a non-blocking URL fetcher?  The following **does not** work:
+Now what if the functions are non-blocking?  For starters, the following could never work:
 ```
-int fetch_url_nonblocking_with_retries(std::string url, int num_retries,
-        std::vector<char> &data) {
-    int status_code;
-    for (int i = 0; i < num_retries; i++) {
-        // This call does not block.
-        status_code = fetch_url_nonblocking(url, data);
-        if (status_code == 200) {
-            return 200;
-        }
+bool func1_async();
+bool func2_async();
+bool func3_async();
+
+bool call_functions_async() {
+    if (!func1_async()) {
+        return false;
     }
-    return status_code;
+    if (!func2_async()) {
+        return false;
+    }
+    if (!func3_async()) {
+        return false;
+    }
+    return true;
 }
 ```
 
-The above DOES NOT WORK:
+It can't work because the non-blocking calls can't immediately return true/false to the
+caller, since the operations they performs are asynchronous.  Furthermore, the above code is spawning three calls that run essentially in parallel, not in series.
 
-1. `fetch_url_nonblocking()` can't return the status code directly, since the non-blocking
-function call returns control to the caller immediately.
-2. As written, this code spawns multiple non-blocking operations inside the for loop, one
-after the other, without waiting for the previous to complete.
-3. The simultaneous calls would all try to write to the same data buffer.
+**SHOW AN EXAMPLES HALF-CLEANUP**
+
+The code could be cleaned up as follows, using **asyncpp**:
+```
+bool func1_async();
+bool func2_async();
+bool func3_async();
+
+bool call_functions_async() {
+    asyncpp::ntimes(3, func1_async();
+}
+```
 
 
 

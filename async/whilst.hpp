@@ -81,11 +81,25 @@ void doUntil(const std::function<void(std::function<void(ErrorCode)>)> &func,
 
 
 /**
-   Perform task until `func` does not pass `OK` to its callback.  Uses `do..while` control flow.  This is inverse of `doWhilst`.
+   Perform task until `func` does not pass `OK` to its callback.
  */
 void forever(const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
   whilst([]() { return true; }, func, final_callback);
+}
+
+/**
+   Perform task a fixed number of times, or until `func` does not pass `OK` to its callback.
+ */
+void ntimes(int times, const std::function<void(std::function<void(ErrorCode)>)> &func,
+    const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
+  int count = 0;
+  whilst([count, times]() mutable {
+        bool keep_going = count < times;
+        count++;
+        return keep_going;
+      },
+      func, final_callback);
 }
 
 }
