@@ -6,51 +6,41 @@ This is a C++ version of the [async](https://github.com/caolan/async) Node.js li
 
 ### What problem does this solve?
 
-In asynchronous programming, e.g. network programming where you don't want to block the
-main thread, you lose the ability to pass data back to a calling function via return
-values.  And if there are many chained asynchronous operations, or some combination of
-serial and parallel async ops, then you quickly wind up with a mess of callbacks.
+In asynchronous programming, e.g. network programming with Boost ASIO where the thread
+doesn't block on network calls, you lose the ability to pass data back to a calling
+function via return values.  And if there are many chained asynchronous operations, or
+some combination of serial and parallel async ops, then you quickly wind up with a mess of
+callbacks.
 
 This library helps by packaging several common patterns of async operations, to keep your code
 clean and reasonable.
 
-Here's a contrived example.  Imagine we have to call 3 blocking functions, in order.  If
-any of the functions returns `false`, we want to return `false to the caller.
+Here's a contrived example.  Imagine we have to call a blocking function three times in a row.  If
+any of the invocations returns `false`, we want to return `false to the caller.
 
 ```
-bool func1();
-bool func2();
-bool func3();
+bool func();
 
-bool call_functions() {
-    if (!func1()) {
-        return false;
-    }
-    if (!func2()) {
-        return false;
-    }
-    if (!func3()) {
-        return false;
-    }
+bool call_func_three_times() {
+    for (int i = 0; i < 3; i++) {
+        if (!func()) {
+            return false;
+        }
     return true;
 }
 ```
 
-Now what if the functions are non-blocking?  For starters, the following could never work:
-```
-bool func1_async();
-bool func2_async();
-bool func3_async();
+Now what if the functions are non-blocking?  As a naive attempt, note that the following
+could not work:
 
-bool call_functions_async() {
-    if (!func1_async()) {
-        return false;
-    }
-    if (!func2_async()) {
-        return false;
-    }
-    if (!func3_async()) {
-        return false;
+```
+bool func_async();
+
+bool call_func_three_times_async() {
+    for (int i = 0; i < 3; i++) {
+        if (!func_async()) {
+            return false;
+        }
     }
     return true;
 }
@@ -62,21 +52,22 @@ caller, since the operations they performs are asynchronous.  Furthermore, the a
 A proper version of the above asynchronous code might look like this:
 ```
 using KeepGoingCallback = std::function<void(bool keep_going)>;
-
-// These functions now spawn some asynchronous activity, and eventually
-// invoke `callback` with either `true` to keep going, or `false` to stop.
-
-void func1_async(KeepGoingCallback callback);
-void func2_async(KeepGoingCallback callback);
-void func3_async(KeepGoingCallback callback);
-
 using FinalCallback = std::function<void(bool return_code)>;
-void call_functions_async(FinalCallback final_callback) {
-    func1_async([final_callback](bool keep_going) {
+
+// This function now spawns some asynchronous activity, and eventually
+// invokes `callback` with either `true` to keep going, or `false` to stop.
+void func_async(KeepGoingCallback callback);
+
+// This now starts the chain of invocations.  Eventually, `final_callback`
+// will be invoked with either `true` if all three functions succeded,
+// or `false` if there were any errors.
+
+void call_function_three_times_async(FinalCallback final_callback) {
+    func_async([final_callback](bool keep_going) {
         if (keep_going) {
-            func2_async([final_callback](bool keep_going) {
+            func_async([final_callback](bool keep_going) {
                 if (keep_going) {
-                    func3_async([final_callback](bool keep_going) {
+                    func_async([final_callback](bool keep_going) {
                         if (keep_going) {
                             final_callback(true);
                         } else {
@@ -94,7 +85,7 @@ void call_functions_async(FinalCallback final_callback) {
 }
 ```
 
-**SHOW AN EXAMPLES HALF-CLEANUP**
+This now works, but is callback hell.
 
 The code could be cleaned up as follows, using **asyncpp**:
 ```
@@ -106,7 +97,6 @@ bool call_functions_async() {
     asyncpp::ntimes(3, func1_async();
 }
 ```
-
 
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
@@ -246,6 +236,12 @@ Similar to [`whilst`](#whilst), except that instead of stopping when `test` retu
 
 Similar to [`doWhilst`](#doWhilst), except that instead of stopping when `test` returns **false**, it stops when `test` returns **true**.
 
+<a name="ntimes">
+#### ntimes
+</a>
+
+Executes a function a given number of times, or until it passes a non-OK (non-zero) error code to its callback.
+
 <a name="forever">
 #### forever
 </a>
@@ -268,6 +264,7 @@ Function | Concurrency | Executes vec of functions | Applies single function to 
 [until](#until)                 | 1           | no  | no  | no  | n/a
 [doUntil](#doUntil)             | 1           | no  | no  | no  | n/a
 [forever](#forever)             | 1           | no  | no  | no  | n/a
+[ntimes](#ntimes)               | 1           | no  | no  | no  | n/a
 
 ### Examples
 
