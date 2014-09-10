@@ -32,7 +32,7 @@ int fetch_url_blocking_with_retries(std::string url, int num_retries,
 }
 ```
 
-Now what if we wanted to use a non-blocked URL fetcher?  The following *does not* work:
+Now what if we wanted to use a non-blocking URL fetcher?  The following **does not** work:
 ```
 int fetch_url_nonblocking_with_retries(std::string url, int num_retries,
         std::vector<char> &data) {
@@ -52,9 +52,9 @@ The above DOES NOT WORK:
 
 1. `fetch_url_nonblocking()` can't return the status code directly, since the non-blocking
 function call returns control to the caller immediately.
-
 2. As written, this code spawns multiple non-blocking operations inside the for loop, one
 after the other, without waiting for the previous to complete.
+3. The simultaneous calls would all try to write to the same data buffer.
 
 
 
