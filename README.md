@@ -18,10 +18,12 @@ Here's a contrived example.  Imagine we need to fetch data from a remote server,
 
 First, a version using a blocking network call (easiest to write):
 ```
-int fetch_url_blocking_with_retries(std::string url, int num_retries, std::vector<char> &data) {
+int fetch_url_blocking_with_retries(std::string url, int num_retries,
+        std::vector<char> &data) {
     int status_code;
     for (int i = 0; i < num_retries; i++) {
-        status_code = fetch_url_blocking(url, data);  // Blocks until network returns data, or error.
+        // Blocks until network returns data, or error.
+        status_code = fetch_url_blocking(url, data);
         if (status_code == 200) {
             return 200;
         }
@@ -32,23 +34,27 @@ int fetch_url_blocking_with_retries(std::string url, int num_retries, std::vecto
 
 Now what if we wanted to use a non-blocked URL fetcher?  The following *does not* work:
 ```
-int fetch_url_nonblocking_with_retries(std::string url, int num_retries, std::vector<char> &data) {
+int fetch_url_nonblocking_with_retries(std::string url, int num_retries,
+        std::vector<char> &data) {
     int status_code;
     for (int i = 0; i < num_retries; i++) {
-        status_code = fetch_url_nonblocking(url, data);  // This does not block.
+        // This call does not block.
+        status_code = fetch_url_nonblocking(url, data);
         if (status_code == 200) {
             return 200;
         }
-
-        // The above DOES NOT WORK:
-        // 1. fetch_url_nonblocking() can't return the status code directly, since
-        //    the non-blocking function call returns control to the caller immediately.
-        // 2. As written, this code spawns multiple non-blocking operations inside the
-        //    for loop, one after the other, without waiting for the previous to complete.
     }
     return status_code;
 }
 ```
+
+The above DOES NOT WORK:
+
+1. `fetch_url_nonblocking()` can't return the status code directly, since the non-blocking
+function call returns control to the caller immediately.
+
+2. As written, this code spawns multiple non-blocking operations inside the for loop, one
+after the other, without waiting for the previous to complete.
 
 
 
