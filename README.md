@@ -55,12 +55,12 @@ using KeepGoingCallback = std::function<void(bool keep_going)>;
 using FinalCallback = std::function<void(bool return_code)>;
 
 // This function now spawns some asynchronous activity, and eventually
-// invokes `callback` with either `true` to keep going, or `false` to stop.
+// invokes callback with either true to keep going, or false to stop.
 void func_async(KeepGoingCallback callback);
 
-// This now starts the chain of invocations.  Eventually, `final_callback`
-// will be invoked with either `true` if all three functions succeded,
-// or `false` if there were any errors.
+// This now starts the chain of invocations.  Eventually, final_callback
+// will be invoked with either true if all three functions succeded,
+// or false if there were any errors.
 
 void call_function_three_times_async(FinalCallback final_callback) {
     func_async([final_callback](bool keep_going) {
