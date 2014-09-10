@@ -59,6 +59,41 @@ bool call_functions_async() {
 It can't work because the non-blocking calls can't immediately return true/false to the
 caller, since the operations they performs are asynchronous.  Furthermore, the above code is spawning three calls that run essentially in parallel, not in series.
 
+A proper version of the above asynchronous code might look like this:
+```
+using KeepGoingCallback = std::function<void(bool keep_going)>;
+
+// These functions now spawn some asynchronous activity, and eventually
+// invoke `callback` with either `true` to keep going, or `false` to stop.
+
+void func1_async(KeepGoingCallback callback);
+void func2_async(KeepGoingCallback callback);
+void func3_async(KeepGoingCallback callback);
+
+using FinalCallback = std::function<void(bool return_code)>;
+void call_functions_async(FinalCallback final_callback) {
+    func1_async([final_callback](bool keep_going) {
+        if (keep_going) {
+            func2_async([final_callback](bool keep_going) {
+                if (keep_going) {
+                    func3_async([final_callback](bool keep_going) {
+                        if (keep_going) {
+                            final_callback(true);
+                        } else {
+                            final_callback(false);
+                        }
+                    });
+                } else {
+                    final_callback(false);
+                }
+            });
+        } else {
+            final_callback(false);
+        }
+    });
+}
+```
+
 **SHOW AN EXAMPLES HALF-CLEANUP**
 
 The code could be cleaned up as follows, using **asyncpp**:
@@ -246,8 +281,8 @@ Run tests with `scons test`.
 ### Requirements
 
 * C++11.
-* Boost, for examples.
-* SCons, to build examples and tests.
+* SCons (`brew install scons`)
+* Boost (`brew install boost`)
 
 Tested with:
 
