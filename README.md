@@ -89,14 +89,20 @@ This now works, but is callback hell.
 
 The code could be cleaned up as follows, using **asyncpp**:
 ```
-bool func1_async();
-bool func2_async();
-bool func3_async();
+using KeepGoingCallback = std::function<void(bool keep_going)>;
 
-bool call_functions_async() {
-    asyncpp::ntimes(3, func1_async();
+void func_async(KeepGoingCallback callback);
+
+using FinalCallback = std::function<void(bool return_code)>;
+
+bool call_function_three_times_async(FinalCallback final_callback) {
+    asyncpp::ntimes(3, func_async, final_callback);
 }
 ```
+
+We've completely generalized the pattern of multiple calls to an sync function, in serial!  The **asyncpp** library also has functions for parallel calls, while loops, filters, and more.
+
+~~~~~~~~~
 
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
