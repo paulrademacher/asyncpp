@@ -11,24 +11,46 @@ main thread, you lose the ability to pass data back to a calling function via re
 values.  And if there are many chained asynchronous operations, or some combination of
 serial and parallel async ops, then you quickly wind up with a mess of callbacks.
 
-This library helps by packaging several patterns of async operations, to keep your code
+This library helps by packaging several common patterns of async operations, to keep your code
 clean and reasonable.
 
 Here's a contrived example.  Imagine we need to fetch data from a remote server, and want to retry three times.
 
-A version using a blocking network call (easiest to write):
+First, a version using a blocking network call (easiest to write):
 ```
-    int fetch_url_with_retries(string url, int num_retries, vector<char> &data) {
-        int status_code;
-        for (int i = 0; i < num_retries; i++) {
-            status_code = fetch_url_blocking(url, data);
-            if (status_code == 200) {
-                return 200;
-            }
+int fetch_url_blocking_with_retries(std::string url, int num_retries, std::vector<char> &data) {
+    int status_code;
+    for (int i = 0; i < num_retries; i++) {
+        status_code = fetch_url_blocking(url, data);  // Blocks until network returns data, or error.
+        if (status_code == 200) {
+            return 200;
         }
-        return status_code;
     }
+    return status_code;
+}
 ```
+
+Now what if we wanted to use a non-blocked URL fetcher?  The following *does not* work:
+```
+int fetch_url_nonblocking_with_retries(std::string url, int num_retries, std::vector<char> &data) {
+    int status_code;
+    for (int i = 0; i < num_retries; i++) {
+        status_code = fetch_url_nonblocking(url, data);  // This does not block.
+        if (status_code == 200) {
+            return 200;
+        }
+
+        // The above DOES NOT WORK:
+        // 1. fetch_url_nonblocking() can't return the status code directly, since
+        //    the non-blocking function call returns control to the caller immediately.
+        // 2. As written, this code spawns multiple non-blocking operations inside the
+        //    for loop, one after the other, without waiting for the previous to complete.
+    }
+    return status_code;
+}
+```
+
+
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
 
