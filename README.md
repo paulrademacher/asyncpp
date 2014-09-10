@@ -102,11 +102,10 @@ bool call_function_three_times_async(FinalCallback final_callback) {
 
 We've completely generalized the pattern of multiple calls to an sync function, in serial!  The **asyncpp** library also has functions for parallel calls, while loops, filters, and more.
 
-~~~~~~~~~
-
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
 
+```
     resolver.async_resolve(query, [=](error_code& err, ...) {
         // Do stuff, then:
         asio::async_connect(socket, iter, [=](error_code& err, ...) {
@@ -128,10 +127,11 @@ Here's an example using the Boost ASIO network library.  Instead of writing:
             }
         }
     }
+```
 
 with **asyncpp** we can instead write this as a flat sequence of steps:
 
-
+```
     using Callback = async::TaskCallback<int>;
     async::TaskVector<int> tasks {
         [](Callback next) {
@@ -164,7 +164,7 @@ with **asyncpp** we can instead write this as a flat sequence of steps:
         }
     };
     async::series<int>(tasks);
-
+```
 
 ### Functions
 
