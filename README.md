@@ -4,7 +4,33 @@ Asyncpp is a C++ utility library for asynchronous or functional programming usin
 
 This is a C++ version of the [async](https://github.com/caolan/async) Node.js library.
 
-This is useful, for example, with the Boost ASIO network library.  Instead of writing:
+### What problem does this solve?
+
+In asynchronous programming, e.g. network programming where you don't want to block the
+main thread, you lose the ability to pass data back to a calling function via return
+values.  And if there are many chained asynchronous operations, or some combination of
+serial and parallel async ops, then you quickly wind up with a mess of callbacks.
+
+This library helps by packaging several patterns of async operations, to keep your code
+clean and reasonable.
+
+Here's a contrived example.  Imagine we need to fetch data from a remote server, and want to retry three times.
+
+A version using a blocking network call (easiest to write):
+```
+    int fetch_url_with_retries(string url, int num_retries, vector<char> &data) {
+        int status_code;
+        for (int i = 0; i < num_retries; i++) {
+            status_code = fetch_url_blocking(url, data);
+            if (status_code == 200) {
+                return 200;
+            }
+        }
+        return status_code;
+    }
+```
+
+Here's an example using the Boost ASIO network library.  Instead of writing:
 
     resolver.async_resolve(query, [=](error_code& err, ...) {
         // Do stuff, then:
@@ -181,9 +207,11 @@ Run tests with `scons test`.
 
 Tested with:
 
-```Apple LLVM version 5.1 (clang-503.0.40) (based on LLVM 3.4svn)
+```
+Apple LLVM version 5.1 (clang-503.0.40) (based on LLVM 3.4svn)
 Target: x86_64-apple-darwin13.3.0
-Thread model: posix ```
+Thread model: posix
+```
 
 ---------
 
