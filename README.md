@@ -110,15 +110,15 @@ resolver.async_resolve(query, [=](error_code& err, ...) {
     // Do stuff, then:
     asio::async_connect(socket, iter, [=](error_code& err, ...) {
         // Do stuff, then:
-        asio::async_write(socket, req, [=](error_code& err, ...) {
+        asio::async_write(socket, request, [=](error_code& err, ...) {
             // Do stuff, then:
-            asio::asio_read_until(socket, resp, "\r\n", [=](error_code& err, ...) {
+            asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                 // Do stuff, then:
-                asio::asio_read_until(socket, resp, "\r\n", [=](error_code& err, ...) {
+                asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                     // Do stuff, then:
-                    asio::asio_read_until(socket, resp, "\r\n", [=](error_code& err, ...) {
+                    asio::asio_read_until(socket, response, "\r\n", [=](error_code& err, ...) {
                         // Do stuff, then:
-                        asio::async_read_until(socket, resp, "\r\n\r\n", [=](error_code& err, ...) {
+                        asio::async_read_until(socket, response, "\r\n\r\n", [=](error_code& err, ...) {
                             // Keep nesting and nesting until your tab key breaks :-(
                         }
                     }
