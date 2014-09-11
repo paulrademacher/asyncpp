@@ -98,9 +98,9 @@ void call_function_three_times_async(FinalCallback final_callback) {
 
 This now *works*, but we're in callback hell.
 
-#### Cleaned up with Asyncpp library
+#### Cleaned up with Asyncpp
 
-Using **asyncpp**, the code becomes:
+Using **Asyncpp** library, the code becomes:
 
 ```c++
 using KeepGoingCallback = std::function<void(bool keep_going)>;
@@ -114,7 +114,7 @@ void call_function_three_times_async(FinalCallback final_callback) {
 ```
 
 We've completely generalized the pattern of multiple serial calls to an asynchronous
-function.  The **asyncpp** library also has functions for parallel calls, parallel calls
+function.  The **Asyncpp** library also has functions for parallel calls, parallel calls
 with a limit on the number of simultaneous outstanding calls, loops, filters, and more.
 
 #### Boost example
