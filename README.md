@@ -76,35 +76,35 @@ void call_function_three_times_async(FinalCallback final_callback) {
                     func_async([final_callback](bool keep_going) {
                         // This lambda too.
                         if (keep_going) {
-                            // We're done and all three calls returned true.
+                            // We're done and all three calls succeeded.
                             final_callback(true);
                         } else {
-                            // We're done but the third call returned false.
+                            // We're done but the third call failed.
                             final_callback(false);
                         }
                     });
                 } else {
-                    // The second call returned false.  Stop.
+                    // The second call failed.  Stop.
                     final_callback(false);
                 }
             });
         } else {
-            // The first call returned false.  Stop.
+            // The first call failed.  Stop.
             final_callback(false);
         }
     });
 }
 ```
 
-This now works, but is callback hell.
+This now *works*, but we're in callback hell.
 
-The code could be cleaned up as follows, using **asyncpp**:
+Using **asyncpp**, the code becomes:
+
 ```c++
 using KeepGoingCallback = std::function<void(bool keep_going)>;
+using FinalCallback = std::function<void(bool return_code)>;
 
 void func_async(KeepGoingCallback callback);
-
-using FinalCallback = std::function<void(bool return_code)>;
 
 bool call_function_three_times_async(FinalCallback final_callback) {
     asyncpp::ntimes(3, func_async, final_callback);
