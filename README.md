@@ -98,6 +98,8 @@ void call_function_three_times_async(FinalCallback final_callback) {
 
 This now *works*, but we're in callback hell.
 
+#### Cleaned up with Asyncpp library
+
 Using **asyncpp**, the code becomes:
 
 ```c++
@@ -106,13 +108,16 @@ using FinalCallback = std::function<void(bool return_code)>;
 
 void func_async(KeepGoingCallback callback);
 
-bool call_function_three_times_async(FinalCallback final_callback) {
-    asyncpp::ntimes(3, func_async, final_callback);
+void call_function_three_times_async(FinalCallback final_callback) {
+    async::ntimes(3, func_async, final_callback);
 }
 ```
 
-We've completely generalized the pattern of multiple calls to an sync function, in serial!  The **asyncpp** library also has functions for parallel calls, while loops, filters, and more.
+We've completely generalized the pattern of multiple serial calls to an asynchronous
+function.  The **asyncpp** library also has functions for parallel calls, parallel calls
+with a limit on the number of simultaneous outstanding calls, loops, filters, and more.
 
+#### Boost example
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
 
