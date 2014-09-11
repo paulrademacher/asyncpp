@@ -96,7 +96,7 @@ void call_function_three_times_async(FinalCallback final_callback) {
 }
 ```
 
-This now *works*, but we're in callback hell.
+This now *works*, but we're in **callback hell**.
 
 #### Cleaned up with Asyncpp
 
@@ -114,7 +114,9 @@ void call_function_three_times_async(FinalCallback final_callback) {
 ```
 
 We've completely generalized the pattern of multiple serial calls to an asynchronous
-function.  The **Asyncpp** library also has functions for parallel calls, parallel calls
+function.
+
+The **Asyncpp** library also has functions for parallel calls, parallel calls
 with a limit on the number of simultaneous outstanding calls, loops, filters, and more.
 
 #### Boost example
@@ -145,38 +147,38 @@ resolver.async_resolve(query, [=](error_code& err, ...) {
 }
 ```
 
-with **asyncpp** we can instead write this as a flat sequence of steps:
+with **asyncpp** we can write this as a flat sequence of steps:
 
 ```c++
     using Callback = async::TaskCallback<int>;
     async::TaskVector<int> tasks {
         [](Callback next) {
             resolver.async_resolve(query,
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 0); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_connect(socket, iter,
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 1); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_write(socket, request,
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 2); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_read_until(socket, response, "\r\n",
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 3); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_read_until(socket, response, "\r\n",
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 4); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_read_until(socket, response, "\r\n",
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 5); };
         }, [](Callback next) {
             // Do stuff, then:
             asio::async_read_until(socket, response, "\r\n\r\n",
-                [=](error_code& err, ...) { next(async::OK); };
+                [=](error_code& err, ...) { next(async::OK, 6); };
         }
     };
     async::series<int>(tasks);
@@ -296,7 +298,6 @@ Examples are in [/examples](/examples) directory.
 
 Run tests with `scons test`.
 
-
 ### Requirements
 
 * C++11.
@@ -310,6 +311,9 @@ Apple LLVM version 5.1 (clang-503.0.40) (based on LLVM 3.4svn)
 Target: x86_64-apple-darwin13.3.0
 Thread model: posix
 ```
+
+This library was developed primarily for use with Boost ASIO, but should support other
+single-thread asynchronous frameworks.  It has not been tested with multithreaded code.
 
 ---------
 
