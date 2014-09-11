@@ -1,24 +1,24 @@
 # asyncpp
 
-Asyncpp is a C++ utility library for asynchronous or functional programming using modern C++ lambdas, without getting into callback hell.
+Asyncpp is a C++ utility library for asynchronous or functional programming using modern C++ lambdas, without getting into callback hell.  It is ideally suited for use with <a href="http://www.boost.org/doc/libs/1_56_0/doc/html/boost_asio/overview/core/basics.html">Boost ASIO</a>.
 
-This is a C++ version of the [async](https://github.com/caolan/async) Node.js library.
+This was inspired by the popular [async](https://github.com/caolan/async) Node.js library.
 
 ### What problem does this solve?
 
-In asynchronous programming, e.g. network programming with Boost ASIO where the thread
-doesn't block on network calls, you lose the ability to pass data back to a calling
+In asynchronous programming (e.g. network programming using Boost ASIO, where the thread
+doesn't block on network calls) you lose the ability to pass data back to a calling
 function via return values.  And if there are many chained asynchronous operations, or
-some combination of serial and parallel async ops, then you quickly wind up with a mess of
-callbacks.
+some combination of serial and parallel asynchronous operations, then you quickly wind up
+with a mess of callbacks.
 
-This library helps by packaging several common patterns of async operations, to keep your code
+This library helps by packaging several common patterns of asynchronous operations, to keep your code
 clean and reasonable.
 
 Here's a contrived example.  Imagine we have to call a blocking function three times in a row.  If
-any of the invocations returns `false`, we want to return `false to the caller.
+any of the invocations returns `false`, we want to return <code>false</code> to the caller.
 
-```
+```c++
 bool func();
 
 bool call_func_three_times() {
@@ -33,7 +33,7 @@ bool call_func_three_times() {
 Now what if the functions are non-blocking?  As a naive attempt, note that the following
 could not work:
 
-```
+```c++
 bool func_async();
 
 bool call_func_three_times_async() {
@@ -242,17 +242,17 @@ Similar to [`whilst`](#whilst), except that instead of stopping when `test` retu
 
 Similar to [`doWhilst`](#doWhilst), except that instead of stopping when `test` returns **false**, it stops when `test` returns **true**.
 
-<a name="ntimes">
-#### ntimes
-</a>
-
-Executes a function a given number of times, or until it passes a non-OK (non-zero) error code to its callback.
-
 <a name="forever">
 #### forever
 </a>
 
 Executes a function repetedly, until it passes a non-OK (non-zero) error code to its callback.  This is equivalent to [`whilst`](#whilst) with a `test` function that always returns **true**.
+
+<a name="ntimes">
+#### ntimes
+</a>
+
+Executes a function a given number of times, or until it passes a non-OK (non-zero) error code to its callback.
 
 ### Summary
 
