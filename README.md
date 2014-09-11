@@ -16,7 +16,7 @@ This library helps by packaging several common patterns of asynchronous operatio
 clean and reasonable.
 
 Here's a contrived example.  Imagine we have to call a blocking function three times in a row.  If
-any of the invocations returns `false`, we want to return <code>false</code> to the caller.
+any of the invocations returns `false`, we want to return `false` to the caller.
 
 ```c++
 bool func();
@@ -26,19 +26,20 @@ bool call_func_three_times() {
         if (!func()) {
             return false;
         }
+    }
     return true;
 }
 ```
 
-Now what if the functions are non-blocking?  As a naive attempt, note that the following
-could not work:
+Now what if the functions are non-blocking?  Note that the following naive attempt would
+not work:
 
 ```c++
 bool func_async();
 
 bool call_func_three_times_async() {
     for (int i = 0; i < 3; i++) {
-        if (!func_async()) {
+        if (!func_async()) {  // Non-blocking.
             return false;
         }
     }
@@ -46,39 +47,49 @@ bool call_func_three_times_async() {
 }
 ```
 
-It can't work because the non-blocking calls can't immediately return true/false to the
-caller, since the operations they performs are asynchronous.  Furthermore, the above code is spawning three calls that run essentially in parallel, not in series.
+It can't work because the non-blocking calls can't really return the final return value,
+since the operations they perform complete at some point in the future.  Furthermore, the
+above code is spawning three calls in parallel, not in series.
 
-A proper version of the above asynchronous code might look like this:
-```
+A proper version of the asynchronous code needs callbacks, and could look like this:
+
+```c++
 using KeepGoingCallback = std::function<void(bool keep_going)>;
 using FinalCallback = std::function<void(bool return_code)>;
 
-// This function now spawns some asynchronous activity, and eventually
-// invokes callback with either true to keep going, or false to stop.
+// This function  spawns some asynchronous activity, and eventually
+// invokes 'callback' with the value true to keep going, or false to stop.
 void func_async(KeepGoingCallback callback);
 
-// This now starts the chain of invocations.  Eventually, final_callback
-// will be invoked with either true if all three functions succeded,
+// Start the chain of invocations.  Eventually, 'final_callback'
+// will be invoked with true if all three functions succeded,
 // or false if there were any errors.
-
 void call_function_three_times_async(FinalCallback final_callback) {
     func_async([final_callback](bool keep_going) {
+        // This lambda is eventually invoked by func_async() when it's
+        // done.  func_async() will pass it true or false, to trigger
+        // the next step in the chain, or stop altogether.
         if (keep_going) {
             func_async([final_callback](bool keep_going) {
+                // This lambda is also invoked by func_async().
                 if (keep_going) {
                     func_async([final_callback](bool keep_going) {
+                        // This lambda too.
                         if (keep_going) {
+                            // We're done and all three calls returned true.
                             final_callback(true);
                         } else {
+                            // We're done but the third call returned false.
                             final_callback(false);
                         }
                     });
                 } else {
+                    // The second call returned false.  Stop.
                     final_callback(false);
                 }
             });
         } else {
+            // The first call returned false.  Stop.
             final_callback(false);
         }
     });
@@ -88,7 +99,7 @@ void call_function_three_times_async(FinalCallback final_callback) {
 This now works, but is callback hell.
 
 The code could be cleaned up as follows, using **asyncpp**:
-```
+```c++
 using KeepGoingCallback = std::function<void(bool keep_going)>;
 
 void func_async(KeepGoingCallback callback);
@@ -105,7 +116,7 @@ We've completely generalized the pattern of multiple calls to an sync function, 
 
 Here's an example using the Boost ASIO network library.  Instead of writing:
 
-```
+```c++
 resolver.async_resolve(query, [=](error_code& err, ...) {
     // Do stuff, then:
     asio::async_connect(socket, iter, [=](error_code& err, ...) {
@@ -131,7 +142,7 @@ resolver.async_resolve(query, [=](error_code& err, ...) {
 
 with **asyncpp** we can instead write this as a flat sequence of steps:
 
-```
+```c++
     using Callback = async::TaskCallback<int>;
     async::TaskVector<int> tasks {
         [](Callback next) {
