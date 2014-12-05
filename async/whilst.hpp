@@ -8,13 +8,13 @@
 
 namespace async {
 
-void noop_whilst_final_callback(ErrorCode) {};
+inline void noop_whilst_final_callback(ErrorCode) {};
 
 /**
    Executes tasks while `test` returns `true`, and while `func` passes `OK` to its
    callback.  Equivalent to `while` control flow.
  */
-void whilst(const std::function<bool()> &test,
+inline void whilst(const std::function<bool()> &test,
     const std::function<void(ErrorCodeCallback)> &func,
     const ErrorCodeCallback &final_callback=noop_whilst_final_callback) {
 
@@ -40,7 +40,7 @@ void whilst(const std::function<bool()> &test,
    Executes tasks while `test` returns `true`, and while `func` passes `OK` to its
    callback.  Equivalent to `do..while` control flow.
  */
-void doWhilst(const std::function<void(std::function<void(ErrorCode)>)> &func,
+inline void doWhilst(const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<bool()> &test,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
 
@@ -62,7 +62,7 @@ void doWhilst(const std::function<void(std::function<void(ErrorCode)>)> &func,
    Perform task until `test` returns true, or until `func` does not pass `OK` to its
    callback.  Uses `while` control flow.  This is inverse of `whilst`.
  */
-void until(const std::function<bool()> &test,
+inline void until(const std::function<bool()> &test,
     const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
   whilst([test]() { return !test(); }, func, final_callback);
@@ -73,7 +73,7 @@ void until(const std::function<bool()> &test,
    Perform task until test returns true, or until `func` does not pass `OK` to its
    callback.  Uses `do..while` control flow.  This is inverse of `doWhilst`.
  */
-void doUntil(const std::function<void(std::function<void(ErrorCode)>)> &func,
+inline void doUntil(const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<bool()> &test,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
   doWhilst(func, [test]() { return !test(); }, final_callback);
@@ -83,7 +83,7 @@ void doUntil(const std::function<void(std::function<void(ErrorCode)>)> &func,
 /**
    Perform task until `func` does not pass `OK` to its callback.
  */
-void forever(const std::function<void(std::function<void(ErrorCode)>)> &func,
+inline void forever(const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
   whilst([]() { return true; }, func, final_callback);
 }
@@ -91,7 +91,7 @@ void forever(const std::function<void(std::function<void(ErrorCode)>)> &func,
 /**
    Perform task a fixed number of times, or until `func` does not pass `OK` to its callback.
  */
-void ntimes(int times, const std::function<void(std::function<void(ErrorCode)>)> &func,
+inline void ntimes(int times, const std::function<void(std::function<void(ErrorCode)>)> &func,
     const std::function<void(ErrorCode)> &final_callback=noop_whilst_final_callback) {
   int count = 0;
   whilst([count, times]() mutable {

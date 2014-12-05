@@ -2,14 +2,14 @@
 
 #define BEGIN_SEQUENCER_TEST(name)                                    \
   BOOST_AUTO_TEST_CASE(name) {                                        \
-    BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);       \
+    BOOST_REQUIRE_EQUAL(*async::sequencer_state_count(), 0);       \
     auto time_start = boost::posix_time::second_clock::local_time();  \
     // Run the sequencer code in its own scope, before then checking  \
     // get_sequencer_state_count()==0.
 
 #define END_SEQUENCER_TEST()                                \
   }                                                         \
-  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
+  BOOST_CHECK_EQUAL(*async::sequencer_state_count(), 0);
 
 
 // ASIO helpers --------------------------------------------------
@@ -22,7 +22,7 @@ using boost::posix_time::seconds;
 
 #define BEGIN_SEQUENCER_ASIO_TEST(name)                                 \
   BOOST_AUTO_TEST_CASE(name) {                                          \
-    BOOST_REQUIRE_EQUAL(async::get_sequencer_state_count(), 0);         \
+    BOOST_REQUIRE_EQUAL(*async::sequencer_state_count(), 0);         \
     boost::asio::io_service io_service;                                 \
     auto time_start = boost::posix_time::second_clock::local_time();    \
     std::vector<std::unique_ptr<boost::asio::deadline_timer>> timers;   \
@@ -33,7 +33,7 @@ using boost::posix_time::seconds;
     io_service.run();                                             \
     delete TO_DELETE;                                             \
   }                                                               \
-  BOOST_CHECK_EQUAL(async::get_sequencer_state_count(), 0);
+  BOOST_CHECK_EQUAL(*async::sequencer_state_count(), 0);
 
 #define CHECK_TIME_LAPSE(expected)                                      \
   {                                                                     \

@@ -17,7 +17,7 @@ BEGIN_SEQUENCER_TEST(test1) {
     BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
         begin(expected), end(expected));
     BOOST_CHECK_EQUAL(error, async::OK);
-    BOOST_CHECK(async::get_sequencer_state_count() > 0);
+    BOOST_CHECK(*async::sequencer_state_count() > 0);
   };
   async::map<int>(data, callback, final_callback);
   BOOST_CHECK(callback_called);
@@ -39,7 +39,7 @@ BEGIN_SEQUENCER_TEST(test_map_with_limits) {
         BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
             begin(expected), end(expected));
         BOOST_CHECK_EQUAL(error, async::OK);
-        BOOST_CHECK(async::get_sequencer_state_count() > 0);
+        BOOST_CHECK(*async::sequencer_state_count() > 0);
       },
       limit);
   BOOST_CHECK(callback_called);
@@ -65,7 +65,7 @@ BEGIN_SEQUENCER_TEST(test_map_with_error) {
         BOOST_CHECK_EQUAL_COLLECTIONS(begin(results), end(results),
             begin(expected), end(expected));
         BOOST_CHECK_EQUAL(error, async::FAIL);
-        BOOST_CHECK(async::get_sequencer_state_count() > 0);
+        BOOST_CHECK(*async::sequencer_state_count() > 0);
       },
       limit);
   BOOST_CHECK(callback_called);

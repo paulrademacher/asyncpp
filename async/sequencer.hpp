@@ -7,12 +7,9 @@ namespace async {
 
 // This value can be asserted to equal zero if there's no pending callbacks.  Otherwise,
 // if it's non-zero after all callbacks have executed, we have a memory leak.
-namespace priv {
-int sequencer_state_count = 0;
-}
-
-int get_sequencer_state_count() {
-  return priv::sequencer_state_count;
+inline int *sequencer_state_count() {
+  static int count = 0;
+  return &count;
 }
 
 /**
@@ -48,11 +45,11 @@ void sequencer(TIter items_begin, TIter items_end,
     std::function<void()> spawn_one;
 
     State() {
-      priv::sequencer_state_count++;
+      (*sequencer_state_count())++;
     }
 
     ~State() {
-      priv::sequencer_state_count--;
+      (*sequencer_state_count())--;
     }
   };
 

@@ -23,6 +23,7 @@ examples = [
 tests = [
     env.Program(target="bin/maptest", source=["test/maptest.cpp"]),
     env.Program(target="bin/seriestest", source=["test/seriestest.cpp"]),
+    env.Program(target="bin/multipledefstest", source=["test/multipledefs1.cpp", "test/multipledefs2.cpp"]),
     ]
 
 test_alias = Alias("test", tests, [t[0].path for t in tests])

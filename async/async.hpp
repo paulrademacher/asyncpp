@@ -38,7 +38,7 @@ using TaskVector = std::vector<Task<T>>;
 using BoolCallback = std::function<void(bool)>;
 
 using ErrorCodeCallback = std::function<void(ErrorCode)>;
-void noop_error_code_final_callback(ErrorCode e) {};
+inline void noop_error_code_final_callback(ErrorCode e) {};
 
 }
 
