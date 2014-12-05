@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_ASYNC_HPP__
-#define __ASYNC_ASYNC_HPP__
+#ifndef ASYNC_ASYNC_HPP
+#define ASYNC_ASYNC_HPP
 
 #include <cassert>
 #include <functional>

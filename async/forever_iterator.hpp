@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_FOREVER_ITERATOR_HPP__
-#define __ASYNC_FOREVER_ITERATOR__
+#ifndef ASYNC_FOREVER_ITERATOR_HPP
+#define ASYNC_FOREVER_ITERATOR
 
 #include <cmath>
 #include <iterator>

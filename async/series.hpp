@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_SERIES_HPP__
-#define __ASYNC_SERIES_HPP__
+#ifndef ASYNC_SERIES_HPP
+#define ASYNC_SERIES_HPP
 
 #include "parallel.hpp"
 

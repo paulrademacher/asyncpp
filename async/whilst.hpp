@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_WHILST_HPP__
-#define __ASYNC_WHILST_HPP__
+#ifndef ASYNC_WHILST_HPP
+#define ASYNC_WHILST_HPP
 
 #include "forever_iterator.hpp"
 #include "sequencer.hpp"

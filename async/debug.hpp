@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_DEBUG_HPP__
-#define __ASYNC_DEBUG_HPP__
+#ifndef ASYNC_DEBUG_HPP
+#define ASYNC_DEBUG_HPP
 
 #include <iostream>
 

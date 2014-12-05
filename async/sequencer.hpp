@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_SEQUENCER_HPP__
-#define __ASYNC_SEQUENCER_HPP__
+#ifndef ASYNC_SEQUENCER_HPP
+#define ASYNC_SEQUENCER_HPP
 
 namespace async {
 

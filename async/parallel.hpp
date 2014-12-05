@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ASYNC_PARALLEL_HPP__
-#define __ASYNC_PARALLEL_HPP__
+#ifndef ASYNC_PARALLEL_HPP
+#define ASYNC_PARALLEL_HPP
 
 #include "sequencer.hpp"
 
