@@ -40,6 +40,8 @@ using BoolCallback = std::function<void(bool)>;
 using ErrorCodeCallback = std::function<void(ErrorCode)>;
 void noop_error_code_final_callback(ErrorCode e) {};
 
+using ResultlessTask = std::function<void(ErrorCodeCallback)>;
+using ResultlessTaskVector = std::vector<ResultlessTask>;
 }
 
 #include "each.hpp"

@@ -43,7 +43,7 @@ void parallel_limit(std::vector<Task<T>> &tasks,
   auto callback = [results](Task<T> task, int index, bool is_last_time,
       std::function<void(bool, ErrorCode)> callback_done) {
 
-    TaskCallback<T> task_callback = [callback_done, results, index](ErrorCode error, T result) {
+    TaskCallback<T> task_callback = [callback_done, results](ErrorCode error, T result) {
       results->push_back(result);
       callback_done(error == OK, error);
     };
@@ -58,6 +58,25 @@ void parallel_limit(std::vector<Task<T>> &tasks,
   sequencer<Task<T>>
       (tasks.begin(), tasks.end(), limit, callback, wrapped_final_callback);
 }
+
+void parallel_limit_no_results(std::vector<ResultlessTask> &tasks,
+    unsigned int limit, const ErrorCodeCallback &final_callback=noop_error_code_final_callback) {
+  auto callback = [](ResultlessTask task, int index, bool is_last_time,
+      std::function<void(bool, ErrorCode)> callback_done) {
+    ErrorCodeCallback task_callback = [callback_done](ErrorCode error) {
+      callback_done(error == OK, error);
+    };
+    task(task_callback);
+  };
+
+  auto wrapped_final_callback = [final_callback](ErrorCode error) {
+    final_callback(error);
+  };
+
+  sequencer<ResultlessTask>
+      (tasks.begin(), tasks.end(), limit, callback, wrapped_final_callback);
+}
+
 
 /**
    Runs tasks in parallel, with no limit on number of concurrent tasks.

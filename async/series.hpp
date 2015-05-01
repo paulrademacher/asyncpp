@@ -20,6 +20,12 @@ void series(std::vector<Task<T>> &tasks,
   parallel_limit(tasks, 1, final_callback);
 }
 
+void series_no_results(std::vector<ResultlessTask> &tasks,
+    const ErrorCodeCallback &final_callback=noop_error_code_final_callback) {
+
+  parallel_limit_no_results(tasks, 1, final_callback);
+}
+
 }
 
 #endif
